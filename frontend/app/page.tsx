@@ -71,17 +71,13 @@ function HomeContent() {
 
       <section className="px-4 pb-8 pt-24 sm:px-6 lg:ml-72 lg:px-8 lg:pt-8">
         <div className="mx-auto max-w-7xl space-y-6">
-          <div className="rounded-2xl border border-blue-100 bg-blue-50 px-5 py-4 text-sm font-semibold text-blue-700">
-            DMARC monitoring · poslední stav reportů, zdrojů a autentizace
-          </div>
-
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <p className="text-sm font-semibold text-slate-500">Account home</p>
               <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">DMARC Logy</h1>
             </div>
             <div className="flex flex-wrap gap-3">
-              <Link href="/import" className="inline-flex h-11 items-center gap-2 rounded-xl bg-orange-500 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-orange-600">
+              <Link href="/import" className="inline-flex h-11 items-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-bold text-white shadow-sm transition hover:bg-blue-700">
                 Importovat <ArrowUpRight size={17} />
               </Link>
               <Link href="/charts" className="inline-flex h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-bold text-slate-700 shadow-sm transition hover:bg-slate-50">
