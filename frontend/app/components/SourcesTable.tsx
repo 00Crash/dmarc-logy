@@ -30,7 +30,7 @@ function pill(value: string) {
 export default function SourcesTable({ sources, loading = false, onClassificationChange }: Props) {
   const [expanded, setExpanded] = useState<string | null>(null);
   const [domainFilter, setDomainFilter] = useState("all");
-  const [stateFilter, setStateFilter] = useState("unknown");
+  const [stateFilter, setStateFilter] = useState("all");
   const [page, setPage] = useState(1);
 
   const domainOptions = useMemo(() => {
@@ -53,7 +53,7 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
 
   function reset() {
     setDomainFilter("all");
-    setStateFilter("unknown");
+    setStateFilter("all");
     setPage(1);
     setExpanded(null);
   }
