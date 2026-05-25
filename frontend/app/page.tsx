@@ -55,20 +55,23 @@ function HomeContent() {
       <section className="px-4 pb-8 pt-24 sm:px-6 lg:ml-72 lg:px-8 lg:pt-8">
         <div className="mx-auto max-w-7xl space-y-6">
           <div className="rounded-[2rem] border border-slate-200/80 bg-white p-6 shadow-sm sm:p-8">
-            <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-              <div>
-                <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-600">Dashboard</p>
-                <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Přehled</h1>
-              </div>
-              <ImportActions onDone={loadData} />
-            </div>
+            <p className="text-sm font-semibold uppercase tracking-[0.24em] text-blue-600">Dashboard</p>
+            <h1 className="mt-3 text-3xl font-bold tracking-tight text-slate-950 sm:text-4xl">Přehled</h1>
           </div>
 
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
 
-          <StatsCards dashboard={dashboard} />
-          <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
-          <RecommendationsList recommendations={recommendations} />
+          <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
+            <div className="space-y-6">
+              <StatsCards dashboard={dashboard} />
+              <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
+              <RecommendationsList recommendations={recommendations} />
+            </div>
+
+            <div className="xl:sticky xl:top-8 xl:self-start">
+              <ImportActions onDone={loadData} />
+            </div>
+          </div>
         </div>
       </section>
 
