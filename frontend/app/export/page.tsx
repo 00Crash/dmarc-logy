@@ -1,11 +1,11 @@
 "use client";
 
-import { Download, FileJson, FileSpreadsheet } from "lucide-react";
+import { Download, FileJson, FileSpreadsheet, FileText } from "lucide-react";
 import { useEffect, useState } from "react";
 import AuthGate from "../components/AuthGate";
 import AppVersionFooter from "../components/AppVersionFooter";
 import NavHeader from "../components/NavHeader";
-import { Dashboard, ReportRow, SourceRow, emptyDashboard } from "../lib";
+import { Dashboard, ReportRow, SourceRow, emptyDashboard, formatDate, formatNumber } from "../lib";
 
 function downloadFile(filename: string, content: string, type: string) {
   const blob = new Blob([content], { type });
@@ -59,6 +59,109 @@ function ExportContent() {
     downloadFile("dmarc-export.json", JSON.stringify({ dashboard, sources, reports }, null, 2), "application/json;charset=utf-8");
   }
 
+  async function exportPdf() {
+    try {
+      setError("");
+      const [{ default: PDFDocument }, { default: blobStream }] = await Promise.all([
+        import("pdfkit/js/pdfkit.standalone.js"),
+        import("blob-stream"),
+      ]);
+
+      const doc = new PDFDocument({ margin: 42, size: "A4" });
+      const stream = doc.pipe(blobStream());
+      const now = new Date().toLocaleString("cs-CZ");
+      const topSources = [...sources].sort((a, b) => b.total_count - a.total_count).slice(0, 18);
+      const latestReports = [...reports].sort((a, b) => (b.created_at || "").localeCompare(a.created_at || "")).slice(0, 14);
+
+      function line(y: number) {
+        doc.moveTo(42, y).lineTo(553, y).strokeColor("#e2e8f0").lineWidth(1).stroke();
+      }
+
+      function section(title: string) {
+        doc.moveDown(1.2);
+        doc.fontSize(14).fillColor("#0f172a").font("Helvetica-Bold").text(title);
+        doc.moveDown(0.4);
+        line(doc.y);
+        doc.moveDown(0.6);
+      }
+
+      function table(headers: string[], rows: string[][], widths: number[]) {
+        const startX = 42;
+        let y = doc.y;
+        doc.fontSize(8).font("Helvetica-Bold").fillColor("#475569");
+        headers.forEach((header, index) => {
+          const x = startX + widths.slice(0, index).reduce((sum, width) => sum + width, 0);
+          doc.text(header, x, y, { width: widths[index], continued: false });
+        });
+        y += 18;
+        doc.moveTo(startX, y - 5).lineTo(553, y - 5).strokeColor("#e2e8f0").stroke();
+        doc.font("Helvetica").fillColor("#0f172a");
+        rows.forEach((row) => {
+          if (y > 745) {
+            doc.addPage();
+            y = 42;
+          }
+          row.forEach((cell, index) => {
+            const x = startX + widths.slice(0, index).reduce((sum, width) => sum + width, 0);
+            doc.text(String(cell || "-").slice(0, 42), x, y, { width: widths[index], height: 24, ellipsis: true });
+          });
+          y += 24;
+          doc.moveTo(startX, y - 6).lineTo(553, y - 6).strokeColor("#f1f5f9").stroke();
+        });
+        doc.y = y + 6;
+      }
+
+      doc.font("Helvetica-Bold").fontSize(24).fillColor("#0f172a").text("DMARC Logy", 42, 42);
+      doc.font("Helvetica").fontSize(10).fillColor("#64748b").text(`PDF report · ${now}`, 42, 72);
+      doc.roundedRect(420, 42, 132, 44, 10).fillAndStroke("#eff6ff", "#bfdbfe");
+      doc.font("Helvetica-Bold").fontSize(18).fillColor("#2563eb").text(`${dashboard.dmarc_pass_rate} %`, 438, 52);
+      doc.font("Helvetica").fontSize(8).fillColor("#475569").text("DMARC pass", 438, 73);
+
+      section("Souhrn");
+      const summaryY = doc.y;
+      const cards = [
+        ["Zprávy", formatNumber(dashboard.total_messages)],
+        ["Zdroje", formatNumber(dashboard.unique_sources)],
+        ["Reporty", formatNumber(dashboard.reports_count)],
+        ["Neznámé", formatNumber(dashboard.unknown_sources)],
+      ];
+      cards.forEach(([label, value], index) => {
+        const x = 42 + index * 128;
+        doc.roundedRect(x, summaryY, 116, 48, 8).fillAndStroke("#ffffff", "#e2e8f0");
+        doc.font("Helvetica").fontSize(8).fillColor("#64748b").text(label, x + 10, summaryY + 9, { width: 96 });
+        doc.font("Helvetica-Bold").fontSize(16).fillColor("#0f172a").text(value, x + 10, summaryY + 24, { width: 96 });
+      });
+      doc.y = summaryY + 58;
+
+      section("Top zdroje");
+      table(
+        ["IP", "Doména", "Provider", "Objem", "DMARC", "SPF", "DKIM"],
+        topSources.map((item) => [item.source_ip, item.header_from, item.provider_name || "-", formatNumber(item.total_count), item.dmarc, item.spf, item.dkim]),
+        [78, 92, 105, 55, 55, 55, 55]
+      );
+
+      section("Importované reporty");
+      table(
+        ["Doména", "Organizace", "Období", "Import", "Zprávy", "Záznamy"],
+        latestReports.map((item) => [item.domain || "-", item.org_name || "-", `${formatDate(item.date_begin)} - ${formatDate(item.date_end)}`, formatDate(item.created_at), formatNumber(item.messages), formatNumber(item.records)]),
+        [88, 118, 102, 78, 58, 58]
+      );
+
+      doc.end();
+      stream.on("finish", () => {
+        const blob = stream.toBlob("application/pdf");
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement("a");
+        link.href = url;
+        link.download = "dmarc-report.pdf";
+        link.click();
+        URL.revokeObjectURL(url);
+      });
+    } catch (err) {
+      setError(String(err).replace("Error: ", ""));
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#f7f7f8] text-slate-950">
       <NavHeader />
@@ -71,7 +174,14 @@ function ExportContent() {
 
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
 
-          <div className="grid gap-4 lg:grid-cols-3">
+          <div className="grid gap-4 lg:grid-cols-4">
+            <button onClick={exportPdf} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40">
+              <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><FileText size={23} /></div>
+              <div className="text-xl font-bold text-slate-950">PDF report</div>
+              <p className="mt-2 text-sm font-medium text-slate-500">Souhrn, metriky a tabulky pro audit.</p>
+              <div className="mt-6 inline-flex items-center gap-2 text-sm font-bold text-blue-600"><Download size={16} /> Stáhnout</div>
+            </button>
+
             <button onClick={exportSourcesCsv} className="rounded-2xl border border-slate-200 bg-white p-6 text-left shadow-sm transition hover:border-blue-200 hover:bg-blue-50/40">
               <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600"><FileSpreadsheet size={23} /></div>
               <div className="text-xl font-bold text-slate-950">Zdroje CSV</div>
