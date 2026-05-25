@@ -1,13 +1,16 @@
 "use client";
 
-import { BarChart3, Clock3, Download, Eye, FileSearch, LineChart, LogOut, ShieldCheck, UploadCloud } from "lucide-react";
+import { BarChart3, Clock3, Download, Eye, FileSearch, Globe2, LineChart, LogOut, Network, ShieldCheck, UploadCloud, UsersRound } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const links = [
   { href: "/", label: "Přehled", Icon: BarChart3 },
   { href: "/charts", label: "Grafy", Icon: LineChart },
+  { href: "/compare", label: "Porovnání", Icon: Network },
   { href: "/detail", label: "Detail", Icon: FileSearch },
+  { href: "/dns", label: "DNS", Icon: Globe2 },
+  { href: "/providers", label: "Provideři", Icon: UsersRound },
   { href: "/watchlist", label: "Watchlist", Icon: Eye },
   { href: "/export", label: "Export", Icon: Download },
   { href: "/import", label: "Import", Icon: UploadCloud },
@@ -35,7 +38,7 @@ export default function NavHeader() {
           </div>
         </Link>
 
-        <nav className="hidden gap-1.5 lg:mt-9 lg:flex lg:flex-col" aria-label="Hlavní menu">
+        <nav className="hidden gap-1 lg:mt-7 lg:flex lg:flex-col lg:overflow-y-auto lg:pr-1" aria-label="Hlavní menu">
           {links.map(({ href, label, Icon }) => {
             const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
             return (
@@ -43,7 +46,7 @@ export default function NavHeader() {
                 key={href}
                 href={href}
                 className={[
-                  "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition",
+                  "flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-semibold transition",
                   active ? "bg-slate-100 text-slate-950" : "text-slate-600 hover:bg-slate-50 hover:text-slate-950",
                 ].join(" ")}
               >
