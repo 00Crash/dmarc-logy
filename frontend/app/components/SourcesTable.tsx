@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useMemo, useState } from "react";
-import { SourceRow, classLabel, domains, formatNumber, resultLabel, resultPill } from "../lib";
+import { SourceRow, domains, formatNumber, resultLabel } from "../lib";
 
 type Props = {
   sources: SourceRow[];
@@ -14,139 +14,100 @@ const CLASSIFICATION_OPTIONS = [
   { value: "unknown", label: "neznámý" },
   { value: "suspicious", label: "podezřelý" },
   { value: "ignored", label: "ignorovaný" },
-  { value: "needs_fix", label: "vyžaduje opravu" }
+  { value: "needs_fix", label: "oprava" },
 ];
 
-export default function SourcesTable({ sources, loading = false, onClassificationChange }: Props) {
-  const [expandedSource, setExpandedSource] = useState<string | null>(null);
-  const [headerFromFilter, setHeaderFromFilter] = useState("all");
-  const DEFAULT_CLASSIFICATION_FILTER = "unknown";
-  const [classificationFilter, setClassificationFilter] = useState(DEFAULT_CLASSIFICATION_FILTER);
+function pill(value: string) {
+  if (value === "pass") return "bg-emerald-50 text-emerald-700 ring-emerald-200";
+  if (value === "fail") return "bg-red-50 text-red-700 ring-red-200";
+  if (value === "mixed") return "bg-amber-50 text-amber-700 ring-amber-200";
+  return "bg-slate-100 text-slate-600 ring-slate-200";
+}
 
-  const headerFromOptions = useMemo(() => {
+export default function SourcesTable({ sources, loading = false, onClassificationChange }: Props) {
+  const [expanded, setExpanded] = useState<string | null>(null);
+  const [domainFilter, setDomainFilter] = useState("all");
+  const [stateFilter, setStateFilter] = useState("unknown");
+
+  const domainOptions = useMemo(() => {
     const values = new Set<string>();
-    for (const source of sources) {
-      for (const domain of source.header_from_domains || []) {
-        const normalized = domain.trim();
-        if (normalized) values.add(normalized);
-      }
-    }
+    sources.forEach((source) => source.header_from_domains?.forEach((domain) => domain && values.add(domain)));
     return Array.from(values).sort((a, b) => a.localeCompare(b, "cs"));
   }, [sources]);
 
-  const filteredSources = useMemo(() => {
+  const filtered = useMemo(() => {
     return sources.filter((source) => {
-      const matchesHeaderFrom =
-        headerFromFilter === "all" || (source.header_from_domains || []).includes(headerFromFilter);
-      const matchesClassification =
-        classificationFilter === "all" || source.classification === classificationFilter;
-      return matchesHeaderFrom && matchesClassification;
+      const domainOk = domainFilter === "all" || source.header_from_domains?.includes(domainFilter);
+      const stateOk = stateFilter === "all" || source.classification === stateFilter;
+      return domainOk && stateOk;
     });
-  }, [sources, headerFromFilter, classificationFilter]);
-
-  const activeFilters = headerFromFilter !== "all" || classificationFilter !== DEFAULT_CLASSIFICATION_FILTER;
-
-  function resetFilters() {
-    setHeaderFromFilter("all");
-    setClassificationFilter(DEFAULT_CLASSIFICATION_FILTER);
-    setExpandedSource(null);
-  }
+  }, [sources, domainFilter, stateFilter]);
 
   return (
-    <section className="card panel full-width sources-card-home">
-      <div className="section-header sources-header">
-        <div className="section-title-block">
-          <h2>Zdroje odesílání</h2>
-          <p>Řádek je kombinace IP adresy a Header From domény. Jedna IP se může zobrazit vícekrát, pokud posílá pro více domén.</p>
+    <section className="overflow-hidden rounded-[1.75rem] border border-slate-200/80 bg-white shadow-sm">
+      <div className="flex flex-col gap-4 border-b border-slate-100 p-5 sm:p-6 xl:flex-row xl:items-center xl:justify-between">
+        <div>
+          <h2 className="text-xl font-bold tracking-tight text-slate-950">Zdroje</h2>
+          <p className="mt-1 text-sm font-medium text-slate-500">{filtered.length} / {sources.length}</p>
         </div>
 
-        <div className="source-filters" aria-label="Filtry zdrojů odesílání">
-          <label className="filter-control">
-            <span>Header From</span>
-            <select value={headerFromFilter} onChange={(event) => setHeaderFromFilter(event.target.value)}>
-              <option value="all">všechny domény</option>
-              {headerFromOptions.map((domain) => (
-                <option value={domain} key={domain}>{domain}</option>
-              ))}
-            </select>
-          </label>
-
-          <label className="filter-control">
-            <span>Stav zdroje</span>
-            <select value={classificationFilter} onChange={(event) => setClassificationFilter(event.target.value)}>
-              <option value="all">všechny stavy</option>
-              {CLASSIFICATION_OPTIONS.map((option) => (
-                <option value={option.value} key={option.value}>{option.label}</option>
-              ))}
-            </select>
-          </label>
-
-          <div className="source-filter-summary" title={`Zobrazeno ${filteredSources.length} z ${sources.length} kombinací zdroj + doména`}>
-            {filteredSources.length}/{sources.length}
-          </div>
-
-          <button className="filter-reset" type="button" onClick={resetFilters} disabled={!activeFilters}>
-            Zrušit filtry
-          </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <select value={domainFilter} onChange={(event) => setDomainFilter(event.target.value)} className="h-11 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+            <option value="all">všechny domény</option>
+            {domainOptions.map((domain) => <option value={domain} key={domain}>{domain}</option>)}
+          </select>
+          <select value={stateFilter} onChange={(event) => setStateFilter(event.target.value)} className="h-11 rounded-2xl border border-slate-200 bg-slate-50 px-4 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10">
+            <option value="all">všechny stavy</option>
+            {CLASSIFICATION_OPTIONS.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
+          </select>
+          <button type="button" onClick={() => { setDomainFilter("all"); setStateFilter("unknown"); }} className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-600 transition hover:bg-slate-50">Reset</button>
         </div>
       </div>
 
-      <div className="table-wrap sources-panel-home">
-        <table className="table compact sources-table">
-          <thead>
+      <div className="overflow-x-auto">
+        <table className="w-full min-w-[980px] text-left text-sm">
+          <thead className="bg-slate-50 text-xs font-bold uppercase tracking-wide text-slate-400">
             <tr>
-              <th>Zdroj</th><th>Header From</th><th>Provider</th><th>Objem</th><th>DMARC</th><th>SPF</th><th>DKIM</th><th>SPF domény</th><th>DKIM domény</th><th>Stav zdroje</th>
+              <th className="px-5 py-4">Zdroj</th>
+              <th className="px-5 py-4">Doména</th>
+              <th className="px-5 py-4">Provider</th>
+              <th className="px-5 py-4">Objem</th>
+              <th className="px-5 py-4">DMARC</th>
+              <th className="px-5 py-4">SPF</th>
+              <th className="px-5 py-4">DKIM</th>
+              <th className="px-5 py-4">Stav</th>
             </tr>
           </thead>
-          <tbody>
-            {sources.length === 0 ? (
-              <tr><td colSpan={10}>Zatím nejsou data.</td></tr>
-            ) : filteredSources.length === 0 ? (
-              <tr><td colSpan={10}>Žádný zdroj neodpovídá vybraným filtrům.</td></tr>
-            ) : filteredSources.map((source) => (
+          <tbody className="divide-y divide-slate-100">
+            {filtered.length === 0 ? (
+              <tr><td className="px-5 py-8 text-center text-slate-500" colSpan={8}>Žádná data.</td></tr>
+            ) : filtered.map((source) => (
               <Fragment key={source.source_key}>
-                <tr>
-                  <td>
-                    <button className="linklike source-main" onClick={() => setExpandedSource(expandedSource === source.source_key ? null : source.source_key)}>{source.source_ip}</button>
-                    <small className="source-rdns">{source.reverse_dns || "bez reverse DNS"}</small>
+                <tr className="transition hover:bg-slate-50/70">
+                  <td className="px-5 py-4 align-top">
+                    <button className="font-bold text-blue-600 hover:text-blue-700" onClick={() => setExpanded(expanded === source.source_key ? null : source.source_key)}>{source.source_ip}</button>
+                    <div className="mt-1 max-w-[190px] truncate text-xs font-medium text-slate-400">{source.reverse_dns || "bez RDNS"}</div>
                   </td>
-                  <td><div className="domain-list" title={source.header_from}>{source.header_from || domains(source.header_from_domains)}</div></td>
-                  <td className="provider-cell" title={source.provider_name || "Neznámý"}>{source.provider_name || "Neznámý"}</td>
-                  <td className="nowrap">{formatNumber(source.total_count)}</td>
-                  <td><span className={resultPill(source.dmarc)}>{resultLabel(source.dmarc)}</span><br /><small>{source.dmarc_pass_rate} %</small></td>
-                  <td><span className={resultPill(source.spf)}>{resultLabel(source.spf)}</span><br /><small>{formatNumber(source.spf_policy_pass_count)} / {formatNumber(source.spf_policy_fail_count)}</small></td>
-                  <td><span className={resultPill(source.dkim)}>{resultLabel(source.dkim)}</span><br /><small>{formatNumber(source.dkim_policy_pass_count)} / {formatNumber(source.dkim_policy_fail_count)}</small></td>
-                  <td><div className="domain-list" title={source.spf_domains?.join(", ")}>{domains(source.spf_domains)}</div></td>
-                  <td><div className="domain-list" title={source.dkim_domains?.join(", ")}>{domains(source.dkim_domains)}</div></td>
-                  <td>
-                    <select value={source.classification} onChange={(event) => onClassificationChange(source.source_id, source.source_ip, event.target.value)} disabled={loading} aria-label={`Stav zdroje ${source.source_ip} ${source.header_from || ""}`}>
-                      {CLASSIFICATION_OPTIONS.map((option) => (
-                        <option value={option.value} key={option.value}>{option.label}</option>
-                      ))}
+                  <td className="px-5 py-4 align-top font-semibold text-slate-700">{source.header_from || domains(source.header_from_domains)}</td>
+                  <td className="px-5 py-4 align-top text-slate-600">{source.provider_name || "Neznámý"}</td>
+                  <td className="px-5 py-4 align-top font-bold text-slate-950">{formatNumber(source.total_count)}</td>
+                  <td className="px-5 py-4 align-top"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${pill(source.dmarc)}`}>{resultLabel(source.dmarc)}</span></td>
+                  <td className="px-5 py-4 align-top"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${pill(source.spf)}`}>{resultLabel(source.spf)}</span></td>
+                  <td className="px-5 py-4 align-top"><span className={`inline-flex rounded-full px-2.5 py-1 text-xs font-bold ring-1 ${pill(source.dkim)}`}>{resultLabel(source.dkim)}</span></td>
+                  <td className="px-5 py-4 align-top">
+                    <select value={source.classification} onChange={(event) => onClassificationChange(source.source_id, source.source_ip, event.target.value)} disabled={loading} className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-semibold text-slate-700 outline-none focus:border-blue-500 focus:ring-4 focus:ring-blue-500/10 disabled:opacity-60">
+                      {CLASSIFICATION_OPTIONS.map((option) => <option value={option.value} key={option.value}>{option.label}</option>)}
                     </select>
                   </td>
                 </tr>
-                {expandedSource === source.source_key && (
-                  <tr className="detail-row">
-                    <td colSpan={10}>
-                      <div className="source-detail-row">
-                        <span><strong>DMARC:</strong> {formatNumber(source.dmarc_pass_count)} pass / {formatNumber(source.dmarc_fail_count)} fail</span>
-                        <span><strong>SPF policy:</strong> {formatNumber(source.spf_policy_pass_count)} pass / {formatNumber(source.spf_policy_fail_count)} fail</span>
-                        <span><strong>DKIM policy:</strong> {formatNumber(source.dkim_policy_pass_count)} pass / {formatNumber(source.dkim_policy_fail_count)} fail</span>
-                        <span><strong>SPF auth:</strong> {formatNumber(source.spf_auth_pass_count)} pass / {formatNumber(source.spf_auth_fail_count)} fail</span>
-                        <span><strong>DKIM auth:</strong> {formatNumber(source.dkim_auth_pass_count)} pass / {formatNumber(source.dkim_auth_fail_count)} fail</span>
-                        <span><strong>Disposition:</strong> none {formatNumber(source.disposition_none_count)}, quarantine {formatNumber(source.disposition_quarantine_count)}, reject {formatNumber(source.disposition_reject_count)}</span>
-                        <span><strong>Envelope From:</strong> {domains(source.envelope_from_domains)}</span>
-                      </div>
-                    </td>
-                  </tr>
+                {expanded === source.source_key && (
+                  <tr className="bg-blue-50/40"><td colSpan={8} className="px-5 py-4 text-sm font-medium text-slate-600">SPF: <strong>{domains(source.spf_domains)}</strong> · DKIM: <strong>{domains(source.dkim_domains)}</strong></td></tr>
                 )}
               </Fragment>
             ))}
           </tbody>
         </table>
       </div>
-      <p className="section-help">Stav zdroje se teď ukládá pro konkrétní kombinaci domény a IP adresy. Stejná IP tedy může být pro jednu doménu známá a pro druhou podezřelá.</p>
     </section>
   );
 }
