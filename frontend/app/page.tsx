@@ -73,7 +73,6 @@ function HomeContent() {
         <div className="mx-auto max-w-7xl space-y-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div>
-              <p className="text-sm font-semibold text-slate-500">Account home</p>
               <h1 className="mt-3 text-4xl font-bold tracking-tight text-slate-950">DMARC Logy</h1>
             </div>
             <div className="flex flex-wrap gap-3">
@@ -89,11 +88,11 @@ function HomeContent() {
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
 
           <section>
-            <h2 className="mb-4 text-xl font-bold tracking-tight text-slate-950">Analytics</h2>
+            <h2 className="mb-4 text-xl font-bold tracking-tight text-slate-950">Analytika</h2>
             <div className="grid gap-4 lg:grid-cols-3">
-              <MetricPanel title="Security" value={`${dashboard.dmarc_pass_rate} %`} helper={`${formatNumber(dashboard.dmarc_pass_count)} pass / ${formatNumber(dashboard.dmarc_fail_count)} fail`} Icon={ShieldCheck} tone="text-emerald-600" />
-              <MetricPanel title="Activity" value={formatNumber(dashboard.total_messages)} helper="zpracovaných zpráv" Icon={Activity} tone="text-blue-600" />
-              <MetricPanel title="Sources" value={formatNumber(dashboard.unique_sources)} helper={`${formatNumber(knownSources)} známé / ${formatNumber(dashboard.unknown_sources)} neznámé`} Icon={Wifi} tone="text-violet-600" />
+              <MetricPanel title="Bezpečnost" value={`${dashboard.dmarc_pass_rate} %`} helper={`${formatNumber(dashboard.dmarc_pass_count)} pass / ${formatNumber(dashboard.dmarc_fail_count)} fail`} Icon={ShieldCheck} tone="text-emerald-600" />
+              <MetricPanel title="Aktivity" value={formatNumber(dashboard.total_messages)} helper="zpracovaných zpráv" Icon={Activity} tone="text-blue-600" />
+              <MetricPanel title="Zdroje" value={formatNumber(dashboard.unique_sources)} helper={`${formatNumber(knownSources)} známé / ${formatNumber(dashboard.unknown_sources)} neznámé`} Icon={Wifi} tone="text-violet-600" />
             </div>
           </section>
 
