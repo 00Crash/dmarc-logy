@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import AuthGate from "./components/AuthGate";
 import AppVersionFooter from "./components/AppVersionFooter";
-import ImportActions from "./components/ImportActions";
 import NavHeader from "./components/NavHeader";
 import RecommendationsList from "./components/RecommendationsList";
 import SourcesTable from "./components/SourcesTable";
@@ -61,17 +60,9 @@ function HomeContent() {
 
           {error && <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">{error}</div>}
 
-          <div className="grid gap-6 xl:grid-cols-[1fr_380px]">
-            <div className="space-y-6">
-              <StatsCards dashboard={dashboard} />
-              <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
-              <RecommendationsList recommendations={recommendations} />
-            </div>
-
-            <div className="xl:sticky xl:top-8 xl:self-start">
-              <ImportActions onDone={loadData} />
-            </div>
-          </div>
+          <StatsCards dashboard={dashboard} />
+          <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
+          <RecommendationsList recommendations={recommendations} />
         </div>
       </section>
 
