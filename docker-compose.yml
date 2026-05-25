@@ -1,0 +1,139 @@
+x-logging: &default-logging
+  driver: "json-file"
+  options:
+    max-size: "10m"
+    max-file: "5"
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: dmarc-logy-db
+    restart: unless-stopped
+    logging: *default-logging
+    env_file: .env
+    environment:
+      TZ: ${TZ:-Europe/Prague}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dmarc_net
+
+  redis:
+    image: redis:7-alpine
+    container_name: dmarc-logy-redis
+    restart: unless-stopped
+    logging: *default-logging
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - dmarc_net
+
+  api:
+    build: ./backend
+    container_name: dmarc-logy-api
+    restart: unless-stopped
+    logging: *default-logging
+    env_file: .env
+    environment:
+      TZ: ${TZ:-Europe/Prague}
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./data/archive:/app/archive
+    networks:
+      - dmarc_net
+
+  worker:
+    build: ./backend
+    container_name: dmarc-logy-worker
+    restart: unless-stopped
+    logging: *default-logging
+    env_file: .env
+    environment:
+      TZ: ${TZ:-Europe/Prague}
+    command: celery -A app.worker.celery_app worker --loglevel=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./data/archive:/app/archive
+    networks:
+      - dmarc_net
+
+  scheduler:
+    build: ./backend
+    container_name: dmarc-logy-scheduler
+    restart: unless-stopped
+    logging: *default-logging
+    env_file: .env
+    environment:
+      TZ: ${TZ:-Europe/Prague}
+    command: celery -A app.worker.celery_app beat --loglevel=INFO
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      worker:
+        condition: service_started
+    volumes:
+      - ./data/uploads:/app/uploads
+      - ./data/archive:/app/archive
+    networks:
+      - dmarc_net
+
+  frontend:
+    build: ./frontend
+    container_name: dmarc-logy-frontend
+    restart: unless-stopped
+    logging: *default-logging
+    environment:
+      TZ: ${TZ:-Europe/Prague}
+      NEXT_PUBLIC_API_URL: /api
+    depends_on:
+      - api
+    networks:
+      - dmarc_net
+
+  proxy:
+    image: nginx:1.27-alpine
+    container_name: dmarc-logy-proxy
+    restart: unless-stopped
+    logging: *default-logging
+    depends_on:
+      - api
+      - frontend
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+    networks:
+      - dmarc_net
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  dmarc_net:
