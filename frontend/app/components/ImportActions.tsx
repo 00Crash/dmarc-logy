@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type Props = {
   onDone: () => Promise<void>;
@@ -11,6 +11,7 @@ export default function ImportActions({ onDone }: Props) {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const fileRef = useRef<HTMLInputElement | null>(null);
 
   async function upload() {
     if (!file) return;
@@ -23,11 +24,11 @@ export default function ImportActions({ onDone }: Props) {
       const res = await fetch("/api/upload", { method: "POST", body: form, credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "Upload selhal");
-      setMessage(data.message || "Report byl zpracován");
+      setMessage("Nahráno");
       setFile(null);
       await onDone();
     } catch (err) {
-      setError(String(err));
+      setError(String(err).replace("Error: ", ""));
     } finally {
       setLoading(false);
     }
@@ -41,34 +42,56 @@ export default function ImportActions({ onDone }: Props) {
       const res = await fetch("/api/imap/run-now", { method: "POST", credentials: "include" });
       const data = await res.json();
       if (!res.ok) throw new Error(data.detail || "IMAP import selhal");
-      setMessage(`IMAP import: ${data.status}, přílohy: ${data.processed_attachments || 0}`);
+      setMessage("Import hotový");
       await onDone();
     } catch (err) {
-      setError(String(err));
+      setError(String(err).replace("Error: ", ""));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <section className="card import-card">
-      <div>
-        <h2>Import reportů</h2>
-        <p>Ruční upload XML/ZIP/GZ nebo okamžité načtení z IMAP mailboxu.</p>
-      </div>
-      <div className="import-actions">
-        <label className="file-picker">
-          <input type="file" accept=".xml,.zip,.gz" onChange={(event) => setFile(event.target.files?.[0] || null)} />
-        </label>
-        <button className="button" onClick={upload} disabled={!file || loading}>Nahrát report</button>
-        <button className="button secondary" onClick={runImap} disabled={loading}>Spustit IMAP import</button>
-      </div>
+    <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+      <input
+        ref={fileRef}
+        type="file"
+        accept=".xml,.zip,.gz"
+        className="hidden"
+        onChange={(event) => setFile(event.target.files?.[0] || null)}
+      />
+
+      <button
+        type="button"
+        onClick={() => fileRef.current?.click()}
+        className="h-11 rounded-2xl border border-slate-200 bg-white px-4 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50 hover:text-blue-700"
+      >
+        {file ? file.name : "Vybrat soubor"}
+      </button>
+
+      <button
+        type="button"
+        onClick={upload}
+        disabled={!file || loading}
+        className="h-11 rounded-2xl bg-blue-600 px-5 text-sm font-semibold text-white shadow-lg shadow-blue-600/20 transition hover:bg-blue-700 disabled:cursor-not-allowed disabled:bg-slate-300 disabled:shadow-none"
+      >
+        Nahrát
+      </button>
+
+      <button
+        type="button"
+        onClick={runImap}
+        disabled={loading}
+        className="h-11 rounded-2xl bg-slate-100 px-5 text-sm font-semibold text-slate-700 transition hover:bg-slate-200 disabled:cursor-not-allowed disabled:text-slate-400"
+      >
+        IMAP import
+      </button>
+
       {(message || error) && (
-        <div className="message-row inline-message">
-          {message && <div className="notice ok">{message}</div>}
-          {error && <div className="notice error">{error}</div>}
-        </div>
+        <span className={error ? "text-sm font-medium text-red-600" : "text-sm font-medium text-emerald-600"}>
+          {error || message}
+        </span>
       )}
-    </section>
+    </div>
   );
 }
