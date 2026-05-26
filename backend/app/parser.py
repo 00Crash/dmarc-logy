@@ -69,6 +69,31 @@ def _int(value: str | None, default: int = 0) -> int:
     try: return int(value or default)
     except Exception: return default
 
+def _is_gzip(data: bytes) -> bool:
+    return data.startswith(b"\x1f\x8b")
+
+def _decompress_gzip(data: bytes, name: str) -> bytes:
+    try:
+        return gzip.GzipFile(fileobj=io.BytesIO(data)).read()
+    except Exception as exc:
+        raise DmarcParseError(f"GZIP nejde rozbalit: {name}: {exc}") from exc
+
+def _looks_like_xml(data: bytes) -> bool:
+    head = data[:512].lstrip(b"\xef\xbb\xbf\t\r\n ")
+    return head.startswith(b"<") and (b"feedback" in head[:256] or b"<?xml" in head[:64])
+
+def _append_payload_if_dmarc(payloads: list[tuple[str, bytes]], name: str, data: bytes) -> None:
+    lower = name.lower()
+    if lower.endswith(".gz") or _is_gzip(data):
+        data = _decompress_gzip(data, name)
+        if lower.endswith(".gz"):
+            name = Path(name).name.removesuffix(".gz")
+    else:
+        name = Path(name).name
+
+    if lower.endswith((".xml", ".xml.gz", ".gz")) or _looks_like_xml(data):
+        payloads.append((name or "report.xml", data))
+
 def iter_xml_payloads(path: Path) -> list[tuple[str, bytes]]:
     suffix = path.name.lower()
     payloads: list[tuple[str, bytes]] = []
@@ -83,11 +108,8 @@ def iter_xml_payloads(path: Path) -> list[tuple[str, bytes]]:
                 if info.is_dir(): continue
                 if info.file_size > 50 * 1024 * 1024:
                     raise DmarcParseError(f"Soubor v ZIPu je příliš velký: {info.filename}")
-                if info.filename.lower().endswith((".xml", ".xml.gz", ".gz")):
-                    data = zf.read(info)
-                    if info.filename.lower().endswith(".gz"):
-                        data = gzip.GzipFile(fileobj=io.BytesIO(data)).read()
-                    payloads.append((Path(info.filename).name, data))
+                data = zf.read(info)
+                _append_payload_if_dmarc(payloads, info.filename, data)
     else:
         raise DmarcParseError("Podporované jsou pouze soubory .xml, .zip a .gz")
     if not payloads:
