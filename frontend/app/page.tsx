@@ -1,5 +1,6 @@
 "use client";
 
+import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import AuthGate from "./components/AuthGate";
 import AppVersionFooter from "./components/AppVersionFooter";
@@ -49,22 +50,32 @@ function HomeContent() {
   }
 
   return (
-    <main className="app-shell">
-      <NavHeader />
-      {error && <div className="notice error page-notice">{error}</div>}
-      <div className="home-frame">
-        <section className="home-overview">
-          <ImportActions onDone={loadData} />
-          <StatsCards dashboard={dashboard} />
-        </section>
-        <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
-        <RecommendationsList recommendations={recommendations} />
+    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.10),transparent_30%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] px-4 py-4 text-slate-950 sm:px-6">
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1760px] flex-col gap-4">
+        <NavHeader />
+
+        {error && (
+          <div className="flex items-center gap-3 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+            <AlertCircle size={18} />
+            {error}
+          </div>
+        )}
+
+        <div className="grid flex-1 gap-4 xl:grid-rows-[auto_minmax(360px,1fr)_minmax(220px,0.75fr)]">
+          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.8fr)_minmax(0,2fr)]">
+            <ImportActions onDone={loadData} />
+            <StatsCards dashboard={dashboard} />
+          </section>
+
+          <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
+          <RecommendationsList recommendations={recommendations} />
+        </div>
+
+        <AppVersionFooter />
       </div>
-      <AppVersionFooter />
     </main>
   );
 }
-
 
 export default function Home() {
   return (
