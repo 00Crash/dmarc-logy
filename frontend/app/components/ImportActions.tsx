@@ -4,7 +4,7 @@ import { Inbox, Loader2, UploadCloud } from "lucide-react";
 import { DragEvent, useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Card, CardContent } from "./ui/card";
 
 type Props = {
   onDone: () => Promise<void>;
@@ -85,56 +85,44 @@ export default function ImportActions({ onDone }: Props) {
 
   return (
     <Card className="h-full shadow-none">
-      <CardHeader className="border-b border-slate-100">
-        <div className="flex items-start justify-between gap-4">
-          <div>
-            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <UploadCloud size={18} className="text-blue-600" />
-              Import reportů
-            </CardTitle>
-            <CardDescription className="mt-2">XML, ZIP nebo GZ report z mailboxu.</CardDescription>
+      <CardContent className="grid h-full grid-rows-[auto_1fr_auto] gap-2 p-3">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
+            <UploadCloud size={16} className="text-blue-600" />
+            Import
           </div>
           <Badge variant="outline">DMARC</Badge>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4 p-5">
         <label
           onDragOver={onDragOver}
           onDragLeave={onDragLeave}
           onDrop={onDrop}
           className={[
-            "group flex min-h-36 cursor-pointer flex-col items-center justify-center rounded-2xl border border-dashed p-5 text-center transition",
+            "group flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed px-3 py-2 text-center transition",
             dragActive ? "border-blue-600 bg-blue-50" : "border-slate-300 bg-white hover:border-blue-500 hover:bg-blue-50/50",
           ].join(" ")}
         >
-          <input
-            ref={fileInputRef}
-            className="sr-only"
-            type="file"
-            accept=".xml,.zip,.gz"
-            onChange={(event) => selectFile(event.target.files?.[0])}
-          />
-          <UploadCloud size={28} className="mb-3 text-blue-600 transition group-hover:-translate-y-0.5" />
-          <span className="text-sm font-semibold text-slate-950">Klikněte pro výběr souboru</span>
-          <span className="mt-1 text-sm text-slate-500">nebo ho sem přetáhněte</span>
-          <span className="mt-3 text-xs font-medium text-slate-400">XML · ZIP · GZ</span>
+          <input ref={fileInputRef} className="sr-only" type="file" accept=".xml,.zip,.gz" onChange={(event) => selectFile(event.target.files?.[0])} />
+          <UploadCloud size={22} className="mb-1 text-blue-600 transition group-hover:-translate-y-0.5" />
+          <span className="text-xs font-semibold text-slate-950">Kliknout nebo přetáhnout</span>
+          <span className="mt-0.5 text-[11px] text-slate-400">XML · ZIP · GZ</span>
         </label>
 
-        {file && <Badge variant="secondary" className="max-w-full truncate">{file.name}</Badge>}
-
         <div className="grid gap-2">
-          <Button onClick={upload} disabled={!file || loading}>
-            {loading ? <Loader2 size={17} className="animate-spin" /> : <UploadCloud size={17} />}
-            Nahrát report
-          </Button>
-          <Button variant="secondary" onClick={runImap} disabled={loading}>
-            {loading ? <Loader2 size={17} className="animate-spin" /> : <Inbox size={17} />}
-            Spustit IMAP import
-          </Button>
+          {file && <Badge variant="secondary" className="max-w-full truncate">{file.name}</Badge>}
+          {(message || error) && <Badge variant={error ? "destructive" : "success"}>{message || error}</Badge>}
+          <div className="grid grid-cols-2 gap-2">
+            <Button size="sm" onClick={upload} disabled={!file || loading}>
+              {loading ? <Loader2 size={15} className="animate-spin" /> : <UploadCloud size={15} />}
+              Nahrát
+            </Button>
+            <Button size="sm" variant="secondary" onClick={runImap} disabled={loading}>
+              {loading ? <Loader2 size={15} className="animate-spin" /> : <Inbox size={15} />}
+              IMAP
+            </Button>
+          </div>
         </div>
-
-        {(message || error) && <Badge variant={error ? "destructive" : "success"}>{message || error}</Badge>}
       </CardContent>
     </Card>
   );
