@@ -19,10 +19,10 @@ export default function NavHeader() {
   }
 
   return (
-    <header className="flex shrink-0 items-center justify-between border-b border-slate-200 pb-4">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">DMARC Logy</h1>
-        <p className="mt-1 text-sm text-slate-500">DMARC, SPF a DKIM přehled.</p>
+    <header className="flex h-14 shrink-0 items-center justify-between border-b border-slate-200">
+      <div className="flex items-baseline gap-3">
+        <h1 className="text-2xl font-semibold tracking-tight text-slate-950">DMARC Logy</h1>
+        <p className="hidden text-sm text-slate-500 lg:block">DMARC, SPF a DKIM</p>
       </div>
 
       <nav className="flex items-center gap-1" aria-label="Hlavní menu">
@@ -33,17 +33,17 @@ export default function NavHeader() {
               key={href}
               href={href}
               className={[
-                "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium transition",
+                "inline-flex h-9 items-center gap-2 rounded-xl px-3 text-sm font-medium transition",
                 active ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "text-slate-500 hover:bg-blue-50 hover:text-blue-700",
               ].join(" ")}
             >
-              <Icon size={16} />
+              <Icon size={15} />
               {label}
             </Link>
           );
         })}
-        <Button variant="ghost" size="sm" className="text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={logout}>
-          <LogOut size={16} />
+        <Button variant="ghost" size="sm" className="h-9 text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={logout}>
+          <LogOut size={15} />
           Odhlásit
         </Button>
       </nav>
