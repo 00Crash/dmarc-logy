@@ -2,8 +2,10 @@
 
 import { Inbox, Loader2, UploadCloud } from "lucide-react";
 import { useState } from "react";
+import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Input } from "./ui/input";
 
 type Props = {
   onDone: () => Promise<void>;
@@ -54,22 +56,27 @@ export default function ImportActions({ onDone }: Props) {
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader className="flex-row items-start justify-between gap-4 space-y-0">
-        <div>
-          <CardTitle>Import reportů</CardTitle>
-          <CardDescription>Ruční upload XML/ZIP/GZ nebo okamžité načtení z IMAP mailboxu.</CardDescription>
-        </div>
-        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
-          <UploadCloud size={22} />
+    <Card className="h-full overflow-hidden">
+      <CardHeader className="border-b border-slate-100">
+        <div className="flex items-start justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2">
+              <UploadCloud size={18} className="text-blue-600" />
+              Import reportů
+            </CardTitle>
+            <CardDescription className="mt-2">Ruční upload XML/ZIP/GZ nebo okamžité načtení z IMAP mailboxu.</CardDescription>
+          </div>
+          <Badge variant="outline">DMARC</Badge>
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-4">
-        <label className="flex cursor-pointer items-center justify-between gap-3 rounded-2xl border border-dashed border-blue-200 bg-blue-50/50 px-4 py-3 transition hover:border-blue-300 hover:bg-blue-50">
-          <span className="truncate text-sm font-bold text-slate-700">{file ? file.name : "Vybrat XML / ZIP / GZ soubor"}</span>
-          <input className="hidden" type="file" accept=".xml,.zip,.gz" onChange={(event) => setFile(event.target.files?.[0] || null)} />
+      <CardContent className="space-y-4 p-5">
+        <label className="grid gap-2">
+          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Soubor</span>
+          <Input type="file" accept=".xml,.zip,.gz" onChange={(event) => setFile(event.target.files?.[0] || null)} />
         </label>
+
+        {file && <Badge variant="secondary" className="max-w-full truncate">{file.name}</Badge>}
 
         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
           <Button onClick={upload} disabled={!file || loading}>
@@ -83,8 +90,8 @@ export default function ImportActions({ onDone }: Props) {
         </div>
 
         {(message || error) && (
-          <div className={error ? "rounded-2xl bg-red-50 px-4 py-3 text-sm font-semibold text-red-700" : "rounded-2xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700"}>
-            {message || error}
+          <div className="pt-1">
+            <Badge variant={error ? "destructive" : "success"}>{message || error}</Badge>
           </div>
         )}
       </CardContent>
