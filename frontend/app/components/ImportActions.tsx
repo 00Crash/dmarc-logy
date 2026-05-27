@@ -56,15 +56,15 @@ export default function ImportActions({ onDone }: Props) {
   }
 
   return (
-    <Card className="h-full overflow-hidden">
+    <Card className="h-full shadow-none">
       <CardHeader className="border-b border-slate-100">
         <div className="flex items-start justify-between gap-4">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <UploadCloud size={18} className="text-blue-600" />
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+              <UploadCloud size={18} />
               Import reportů
             </CardTitle>
-            <CardDescription className="mt-2">Ruční upload XML/ZIP/GZ nebo okamžité načtení z IMAP mailboxu.</CardDescription>
+            <CardDescription className="mt-2">XML, ZIP nebo GZ report z mailboxu.</CardDescription>
           </div>
           <Badge variant="outline">DMARC</Badge>
         </div>
@@ -72,13 +72,13 @@ export default function ImportActions({ onDone }: Props) {
 
       <CardContent className="space-y-4 p-5">
         <label className="grid gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wide text-slate-500">Soubor</span>
+          <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">Soubor</span>
           <Input type="file" accept=".xml,.zip,.gz" onChange={(event) => setFile(event.target.files?.[0] || null)} />
         </label>
 
         {file && <Badge variant="secondary" className="max-w-full truncate">{file.name}</Badge>}
 
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
+        <div className="grid gap-2">
           <Button onClick={upload} disabled={!file || loading}>
             {loading ? <Loader2 size={17} className="animate-spin" /> : <UploadCloud size={17} />}
             Nahrát report
@@ -89,11 +89,7 @@ export default function ImportActions({ onDone }: Props) {
           </Button>
         </div>
 
-        {(message || error) && (
-          <div className="pt-1">
-            <Badge variant={error ? "destructive" : "success"}>{message || error}</Badge>
-          </div>
-        )}
+        {(message || error) && <Badge variant={error ? "destructive" : "success"}>{message || error}</Badge>}
       </CardContent>
     </Card>
   );
