@@ -14,7 +14,7 @@ type Props = {
   onClassificationChange: (sourceId: number | null, sourceIp: string, classification: string) => Promise<void>;
 };
 
-const PAGE_SIZE = 50;
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 const CLASSIFICATION_OPTIONS = [
   { value: "known", label: "známý" },
@@ -29,6 +29,7 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
   const [headerFromFilter, setHeaderFromFilter] = useState("all");
   const [classificationFilter, setClassificationFilter] = useState("all");
   const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
 
   const headerFromOptions = useMemo(() => {
     const values = new Set<string>();
@@ -49,9 +50,9 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
     });
   }, [sources, headerFromFilter, classificationFilter]);
 
-  const totalPages = Math.max(1, Math.ceil(filteredSources.length / PAGE_SIZE));
+  const totalPages = Math.max(1, Math.ceil(filteredSources.length / pageSize));
   const safePage = Math.min(page, totalPages);
-  const pagedSources = filteredSources.slice((safePage - 1) * PAGE_SIZE, safePage * PAGE_SIZE);
+  const pagedSources = filteredSources.slice((safePage - 1) * pageSize, safePage * pageSize);
   const activeFilters = headerFromFilter !== "all" || classificationFilter !== "all";
 
   function resetFilters() {
@@ -73,13 +74,19 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
     setExpandedSource(null);
   }
 
+  function changePageSize(value: string) {
+    setPageSize(Number(value));
+    setPage(1);
+    setExpandedSource(null);
+  }
+
   return (
     <Card className="overflow-hidden shadow-none">
       <CardHeader className="border-b border-slate-100">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-end xl:justify-between">
           <div>
             <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-              <Server size={18} />
+              <Server size={18} className="text-blue-600" />
               Zdroje odesílání
             </CardTitle>
             <CardDescription className="mt-2">Kombinace zdrojové IP adresy a Header From domény.</CardDescription>
@@ -174,7 +181,15 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
         </TableWrapper>
 
         <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="text-sm text-slate-500">Strana {safePage} / {totalPages} · {filteredSources.length} záznamů</div>
+          <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center">
+            <span>Strana {safePage} / {totalPages} · {filteredSources.length} záznamů</span>
+            <label className="flex items-center gap-2">
+              <span>Na stránku</span>
+              <select value={pageSize} onChange={(event) => changePageSize(event.target.value)} className="h-9 rounded-xl border border-slate-200 bg-white px-2 text-sm text-slate-700 outline-none focus:border-slate-400">
+                {PAGE_SIZE_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+          </div>
           <div className="flex gap-2">
             <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
               <ChevronLeft size={15} /> Zpět
