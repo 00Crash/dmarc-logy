@@ -34,7 +34,7 @@ export default function NavHeader() {
               href={href}
               className={[
                 "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium transition",
-                active ? "bg-slate-950 text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-950",
+                active ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "text-slate-500 hover:bg-blue-50 hover:text-blue-700",
               ].join(" ")}
             >
               <Icon size={16} />
@@ -42,7 +42,7 @@ export default function NavHeader() {
             </Link>
           );
         })}
-        <Button variant="ghost" size="sm" className="text-slate-500" onClick={logout}>
+        <Button variant="ghost" size="sm" className="text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={logout}>
           <LogOut size={16} />
           Odhlásit
         </Button>
