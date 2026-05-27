@@ -51,8 +51,8 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(37,99,235,0.12),transparent_30%),linear-gradient(180deg,#f8fafc_0%,#eef4ff_100%)] px-4 py-4 text-slate-950 sm:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1760px] flex-col gap-4">
+    <main className="min-h-screen bg-white px-4 py-4 text-slate-950 sm:px-6">
+      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1680px] flex-col gap-6">
         <NavHeader />
 
         {error && (
@@ -62,8 +62,8 @@ function HomeContent() {
           </Card>
         )}
 
-        <div className="grid flex-1 gap-4 xl:grid-rows-[auto_minmax(360px,1fr)_minmax(220px,0.75fr)]">
-          <section className="grid gap-4 xl:grid-cols-[minmax(360px,0.8fr)_minmax(0,2fr)]">
+        <div className="grid flex-1 gap-6">
+          <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
             <ImportActions onDone={loadData} />
             <StatsCards dashboard={dashboard} />
           </section>
