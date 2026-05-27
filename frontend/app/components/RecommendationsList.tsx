@@ -1,6 +1,13 @@
-import { AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
+"use client";
+
+import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
+import { useMemo, useState } from "react";
 import { Recommendation, priorityClass } from "../lib";
+import { Button } from "./ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "./ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "./ui/table";
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
 function priorityLabel(value: string) {
   if (value === "critical") return "kritická";
@@ -10,48 +17,81 @@ function priorityLabel(value: string) {
 }
 
 export default function RecommendationsList({ recommendations }: { recommendations: Recommendation[] }) {
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(10);
+  const totalPages = Math.max(1, Math.ceil(recommendations.length / pageSize));
+  const safePage = Math.min(page, totalPages);
+  const paged = useMemo(() => recommendations.slice((safePage - 1) * pageSize, safePage * pageSize), [recommendations, safePage, pageSize]);
+
+  function changePageSize(value: string) {
+    setPageSize(Number(value));
+    setPage(1);
+  }
+
   return (
-    <Card className="flex min-h-0 flex-col overflow-hidden">
-      <CardHeader className="flex-row items-center justify-between gap-4 border-b border-slate-100 space-y-0">
-        <div className="flex min-w-0 items-center gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-amber-50 text-amber-600">
-            <ShieldAlert size={21} />
+    <Card className="overflow-hidden shadow-none">
+      <CardHeader className="border-b border-slate-100">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+              <ShieldAlert size={18} className="text-blue-600" />
+              Doporučení
+            </CardTitle>
+            <CardDescription className="mt-2">Úkoly podle SPF, DKIM a DMARC výsledků.</CardDescription>
           </div>
-          <div className="min-w-0">
-            <CardTitle>Doporučení</CardTitle>
-            <CardDescription>Kompaktní seznam úkolů podle SPF/DKIM/DMARC výsledků.</CardDescription>
-          </div>
+          <div className="text-sm text-slate-500">{recommendations.length}</div>
         </div>
-        <span className="inline-flex h-9 min-w-9 items-center justify-center rounded-full bg-blue-50 px-3 text-sm font-black text-blue-700">{recommendations.length}</span>
       </CardHeader>
 
-      <CardContent className="min-h-0 flex-1 overflow-auto p-0">
-        <table className="w-full min-w-[900px] border-separate border-spacing-0 text-left text-sm">
-          <thead className="sticky top-0 z-10 bg-slate-50 text-xs font-black uppercase tracking-wide text-slate-400">
-            <tr>
-              <th className="border-b border-slate-200 px-4 py-3">Priorita</th>
-              <th className="border-b border-slate-200 px-4 py-3">Zdroj</th>
-              <th className="border-b border-slate-200 px-4 py-3">Problém</th>
-              <th className="border-b border-slate-200 px-4 py-3">Doporučená akce</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-slate-100">
-            {recommendations.length === 0 ? (
-              <tr>
-                <td colSpan={4} className="px-4 py-8 text-center text-sm font-semibold text-slate-500">
-                  <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} className="text-emerald-600" />Zatím nejsou doporučení.</span>
-                </td>
-              </tr>
-            ) : recommendations.map((item, index) => (
-              <tr className="transition hover:bg-slate-50/80" key={`${item.source_ip}-${index}`}>
-                <td className="px-4 py-3 align-top"><span className={priorityClass(item.priority)}><AlertTriangle size={13} />{priorityLabel(item.priority)}</span></td>
-                <td className="px-4 py-3 align-top font-mono text-sm font-bold text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</td>
-                <td className="px-4 py-3 align-top font-black text-slate-950" title={item.title}>{item.title}</td>
-                <td className="px-4 py-3 align-top font-medium leading-6 text-slate-600" title={item.detail}>{item.detail}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <CardContent className="p-0">
+        <TableWrapper className="max-h-[420px]">
+          <Table className="min-w-[900px]">
+            <TableHeader>
+              <TableRow className="hover:bg-slate-50">
+                <TableHead>Priorita</TableHead>
+                <TableHead>Zdroj</TableHead>
+                <TableHead>Problém</TableHead>
+                <TableHead>Doporučená akce</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {recommendations.length === 0 ? (
+                <TableRow>
+                  <TableCell colSpan={4} className="py-10 text-center text-sm text-slate-500">
+                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} className="text-blue-600" />Zatím nejsou doporučení.</span>
+                  </TableCell>
+                </TableRow>
+              ) : paged.map((item, index) => (
+                <TableRow key={`${item.source_ip}-${index}`}>
+                  <TableCell><span className={priorityClass(item.priority)}><AlertTriangle size={13} />{priorityLabel(item.priority)}</span></TableCell>
+                  <TableCell className="font-mono text-sm font-medium text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</TableCell>
+                  <TableCell className="font-medium text-slate-950" title={item.title}>{item.title}</TableCell>
+                  <TableCell className="leading-6 text-slate-600" title={item.detail}>{item.detail}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableWrapper>
+
+        <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center">
+            <span>Strana {safePage} / {totalPages} · {recommendations.length} záznamů</span>
+            <label className="flex items-center gap-2">
+              <span>Na stránku</span>
+              <select value={pageSize} onChange={(event) => changePageSize(event.target.value)} className="h-9 rounded-xl border border-slate-200 bg-white px-2 text-sm text-slate-700 outline-none focus:border-slate-400">
+                {PAGE_SIZE_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}
+              </select>
+            </label>
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" disabled={safePage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
+              <ChevronLeft size={15} /> Zpět
+            </Button>
+            <Button variant="outline" size="sm" disabled={safePage >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>
+              Další <ChevronRight size={15} />
+            </Button>
+          </div>
+        </div>
       </CardContent>
     </Card>
   );
