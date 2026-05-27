@@ -3,7 +3,6 @@
 import { AlertCircle } from "lucide-react";
 import { useEffect, useState } from "react";
 import AuthGate from "./components/AuthGate";
-import AppVersionFooter from "./components/AppVersionFooter";
 import ImportActions from "./components/ImportActions";
 import NavHeader from "./components/NavHeader";
 import RecommendationsList from "./components/RecommendationsList";
@@ -51,19 +50,19 @@ function HomeContent() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-4 py-4 text-slate-950 sm:px-6">
-      <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1680px] flex-col gap-6">
+    <main className="h-screen overflow-hidden bg-white px-5 py-4 text-slate-950">
+      <div className="mx-auto grid h-full max-w-[1840px] grid-rows-[auto_minmax(0,1fr)] gap-4">
         <NavHeader />
 
-        {error && (
-          <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700">
+        {error ? (
+          <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-none">
             <AlertCircle size={18} />
             {error}
           </Card>
-        )}
+        ) : null}
 
-        <div className="grid flex-1 gap-6">
-          <section className="grid gap-6 xl:grid-cols-[420px_minmax(0,1fr)]">
+        <div className="grid min-h-0 grid-rows-[150px_minmax(0,1fr)_238px] gap-4">
+          <section className="grid min-h-0 gap-4 xl:grid-cols-[330px_minmax(0,1fr)]">
             <ImportActions onDone={loadData} />
             <StatsCards dashboard={dashboard} />
           </section>
@@ -71,8 +70,6 @@ function HomeContent() {
           <SourcesTable sources={sources} loading={loading} onClassificationChange={setClassification} />
           <RecommendationsList recommendations={recommendations} />
         </div>
-
-        <AppVersionFooter />
       </div>
     </main>
   );
