@@ -1,10 +1,9 @@
 "use client";
 
-import { Clock3, Home, LogOut, ShieldCheck } from "lucide-react";
+import { Clock3, Home, LogOut } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Button } from "./ui/button";
-import { Card } from "./ui/card";
 
 const links = [
   { href: "/", label: "Home", Icon: Home },
@@ -20,20 +19,13 @@ export default function NavHeader() {
   }
 
   return (
-    <Card className="flex shrink-0 flex-col gap-4 p-5 lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex min-w-0 items-center gap-4">
-        <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-blue-600 text-white shadow-lg shadow-blue-600/20">
-          <ShieldCheck size={24} strokeWidth={2.4} />
-        </div>
-        <div className="min-w-0">
-          <h1 className="text-3xl font-black leading-none tracking-tight text-slate-950 sm:text-4xl">DMARC Logy</h1>
-          <p className="mt-2 truncate text-sm font-medium text-slate-500">
-            Přehled DMARC aggregate reportů, zdrojových IP adres a výsledků DMARC, SPF a DKIM.
-          </p>
-        </div>
+    <header className="flex shrink-0 items-center justify-between border-b border-slate-200 pb-4">
+      <div>
+        <h1 className="text-3xl font-semibold tracking-tight text-slate-950">DMARC Logy</h1>
+        <p className="mt-1 text-sm text-slate-500">DMARC, SPF a DKIM přehled.</p>
       </div>
 
-      <nav className="flex shrink-0 flex-wrap items-center gap-2 rounded-2xl border border-slate-200 bg-slate-50 p-1" aria-label="Hlavní menu">
+      <nav className="flex items-center gap-1" aria-label="Hlavní menu">
         {links.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
@@ -41,20 +33,20 @@ export default function NavHeader() {
               key={href}
               href={href}
               className={[
-                "inline-flex h-11 items-center gap-2 rounded-xl px-4 text-sm font-black transition",
-                active ? "bg-blue-600 text-white shadow-sm shadow-blue-600/20" : "text-slate-600 hover:bg-white hover:text-slate-950",
+                "inline-flex h-10 items-center gap-2 rounded-xl px-3 text-sm font-medium transition",
+                active ? "bg-slate-950 text-white" : "text-slate-500 hover:bg-slate-100 hover:text-slate-950",
               ].join(" ")}
             >
-              <Icon size={17} />
+              <Icon size={16} />
               {label}
             </Link>
           );
         })}
-        <Button variant="outline" className="rounded-xl hover:border-red-200 hover:bg-red-50 hover:text-red-700" onClick={logout}>
-          <LogOut size={17} />
+        <Button variant="ghost" size="sm" className="text-slate-500" onClick={logout}>
+          <LogOut size={16} />
           Odhlásit
         </Button>
       </nav>
-    </Card>
+    </header>
   );
 }
