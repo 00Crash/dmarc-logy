@@ -65,34 +65,32 @@ export default function ImportActions({ onDone }: Props) {
 
   return (
     <Card className="h-full shadow-none">
-      <CardContent className="grid h-full grid-rows-[auto_1fr_auto] gap-2 p-3">
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-center gap-2 text-sm font-semibold text-slate-950">
-            <UploadCloud size={16} className="text-blue-600" />
-            Import
-          </div>
-          <Badge variant="outline">DMARC</Badge>
+      <CardContent className="flex h-full min-w-0 items-center gap-2 p-3">
+        <div className="flex shrink-0 items-center gap-2 text-sm font-semibold text-slate-950">
+          <UploadCloud size={16} className="text-blue-600" />
+          Import
         </div>
 
-        <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:border-blue-500 hover:bg-blue-50/60">
+        <label className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:border-blue-500 hover:bg-blue-50/60">
           <input ref={fileInputRef} className="sr-only" type="file" accept=".xml,.zip,.gz" onChange={(event) => selectFile(event.target.files?.[0])} />
-          <UploadCloud size={17} className="text-blue-600" />
-          <span className="max-w-[150px] truncate">{file ? file.name : "Vybrat soubor"}</span>
+          <UploadCloud size={16} className="shrink-0 text-blue-600" />
+          <span className="truncate">{file ? file.name : "Vybrat soubor"}</span>
         </label>
 
-        <div className="grid gap-1.5">
-          {(message || error) && <Badge variant={error ? "destructive" : "success"} className="truncate">{message || error}</Badge>}
-          <div className="grid grid-cols-2 gap-2">
-            <Button size="sm" className="h-8" onClick={upload} disabled={!file || loading}>
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <UploadCloud size={14} />}
-              Nahrát
-            </Button>
-            <Button size="sm" className="h-8" variant="secondary" onClick={runImap} disabled={loading}>
-              {loading ? <Loader2 size={14} className="animate-spin" /> : <Inbox size={14} />}
-              IMAP
-            </Button>
-          </div>
-        </div>
+        {(message || error) && (
+          <Badge variant={error ? "destructive" : "success"} className="max-w-24 shrink-0 truncate">
+            {message || error}
+          </Badge>
+        )}
+
+        <Button size="sm" className="h-9 shrink-0 px-3" onClick={upload} disabled={!file || loading}>
+          {loading ? <Loader2 size={14} className="animate-spin" /> : <UploadCloud size={14} />}
+          Nahrát
+        </Button>
+        <Button size="sm" className="h-9 shrink-0 px-3" variant="secondary" onClick={runImap} disabled={loading}>
+          {loading ? <Loader2 size={14} className="animate-spin" /> : <Inbox size={14} />}
+          IMAP
+        </Button>
       </CardContent>
     </Card>
   );
