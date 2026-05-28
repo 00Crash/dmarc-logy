@@ -22,9 +22,9 @@ function Pager({ page, totalPages, total, pageSize, setPage, setPageSize }: {
   return (
     <div className="flex items-center justify-between border-t border-slate-100 px-4 py-1.5">
       <div className="flex items-center gap-3 text-[11px] text-slate-500">
-        <span>Strana {page} / {totalPages} \u00b7 {total} z\u00e1znam\u016f</span>
+        <span>Strana {page} / {totalPages} · {total} záznamů</span>
         <label className="flex items-center gap-1.5">
-          Na str\u00e1nku
+          Na stránku
           <select
             value={pageSize}
             onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
@@ -36,10 +36,10 @@ function Pager({ page, totalPages, total, pageSize, setPage, setPageSize }: {
       </div>
       <div className="flex gap-1">
         <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}>
-          <ChevronLeft size={11} /> Zp\u011bt
+          <ChevronLeft size={11} /> Zpět
         </Button>
         <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" disabled={page >= totalPages} onClick={() => setPage((v) => Math.min(totalPages, v + 1))}>
-          Dal\u0161\u00ed <ChevronRight size={11} />
+          Další <ChevronRight size={11} />
         </Button>
       </div>
     </div>
@@ -101,30 +101,15 @@ function HistoryContent() {
 
         <div className="grid min-h-0 grid-rows-2 gap-2">
 
-          {/* Vývoj v čase */}
           <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden shadow-none">
             <div className="flex items-center justify-between border-b border-slate-100 px-4 py-1.5">
               <CardTitle className="flex items-center gap-2 text-xs font-semibold">
                 <CalendarClock size={14} className="text-blue-600" />
-                V\u00fdvoj v \u010dase
+                Vývoj v čase
               </CardTitle>
               <div className="inline-flex rounded-lg border border-slate-200 p-0.5">
-                <Button
-                  variant={timelineMode === "report" ? "default" : "ghost"}
-                  size="sm"
-                  className="h-6 px-2.5 text-[11px]"
-                  onClick={() => { setTimelineMode("report"); setTimelinePage(1); }}
-                >
-                  Obdob\u00ed reportu
-                </Button>
-                <Button
-                  variant={timelineMode === "import" ? "default" : "ghost"}
-                  size="sm"
-                  className="h-6 px-2.5 text-[11px]"
-                  onClick={() => { setTimelineMode("import"); setTimelinePage(1); }}
-                >
-                  Datum importu
-                </Button>
+                <Button variant={timelineMode === "report" ? "default" : "ghost"} size="sm" className="h-6 px-2.5 text-[11px]" onClick={() => { setTimelineMode("report"); setTimelinePage(1); }}>Období reportu</Button>
+                <Button variant={timelineMode === "import" ? "default" : "ghost"} size="sm" className="h-6 px-2.5 text-[11px]" onClick={() => { setTimelineMode("import"); setTimelinePage(1); }}>Datum importu</Button>
               </div>
             </div>
             <CardContent className="min-h-0 p-0">
@@ -139,10 +124,10 @@ function HistoryContent() {
                   </TableHeader>
                   <TableBody>
                     {timelineRows.length === 0 ? (
-                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={5}>Zat\u00edm nejsou importovan\u00e1 data.</TableCell></TableRow>
+                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={5}>Zatím nejsou importovaná data.</TableCell></TableRow>
                     ) : pagedTimelineRows.map((row) => (
                       <TableRow key={row.date} className="h-[26px]">
-                        <TableCell className="py-0 text-[11px] font-medium text-slate-950 whitespace-nowrap">{row.date}</TableCell>
+                        <TableCell className="whitespace-nowrap py-0 text-[11px] font-medium text-slate-950">{row.date}</TableCell>
                         <TableCell className="py-0 text-[11px]">{formatNumber(row.total)}</TableCell>
                         <TableCell className="py-0 text-[11px]">{formatNumber(row.pass)}</TableCell>
                         <TableCell className="py-0 text-[11px]">{formatNumber(row.fail)}</TableCell>
@@ -156,12 +141,11 @@ function HistoryContent() {
             <Pager page={safeTimelinePage} totalPages={timelineTotalPages} total={timelineRows.length} pageSize={timelinePageSize} setPage={setTimelinePage} setPageSize={setTimelinePageSize} />
           </Card>
 
-          {/* Importované reporty */}
           <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden shadow-none">
             <div className="flex items-center border-b border-slate-100 px-4 py-1.5">
               <CardTitle className="flex items-center gap-2 text-xs font-semibold">
                 <FileText size={14} className="text-blue-600" />
-                Importovan\u00e9 reporty
+                Importované reporty
               </CardTitle>
             </div>
             <CardContent className="min-h-0 p-0">
@@ -169,23 +153,23 @@ function HistoryContent() {
                 <Table className="min-w-[1080px]">
                   <TableHeader>
                     <TableRow className="hover:bg-transparent">
-                      {["Organizace", "Dom\u00e9na", "Obdob\u00ed reportu", "Datum importu", "Zpr\u00e1vy", "Z\u00e1znamy", "Soubor"].map((h) => (
+                      {["Organizace", "Doména", "Období reportu", "Datum importu", "Zprávy", "Záznamy", "Soubor"].map((h) => (
                         <TableHead className="py-0.5 text-[11px]" key={h}>{h}</TableHead>
                       ))}
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {reports.length === 0 ? (
-                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={7}>Zat\u00edm nejsou importovan\u00e9 reporty.</TableCell></TableRow>
+                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={7}>Zatím nejsou importované reporty.</TableCell></TableRow>
                     ) : pagedReports.map((report, i) => (
                       <TableRow key={`${report.report_id}-${i}`} className="h-[26px]">
-                        <TableCell className="max-w-[200px] truncate py-0 text-[11px] font-medium text-slate-950" title={report.org_name}>{report.org_name || "\u2014"}</TableCell>
-                        <TableCell className="max-w-[180px] truncate py-0 text-[11px] text-slate-700" title={report.domain}>{report.domain || "\u2014"}</TableCell>
-                        <TableCell className="py-0 text-[11px] text-slate-600 whitespace-nowrap">{formatDate(report.date_begin)} \u2013 {formatDate(report.date_end)}</TableCell>
-                        <TableCell className="py-0 text-[11px] text-slate-600 whitespace-nowrap">{formatDate(report.created_at)}</TableCell>
+                        <TableCell className="max-w-[200px] truncate py-0 text-[11px] font-medium text-slate-950" title={report.org_name}>{report.org_name || "—"}</TableCell>
+                        <TableCell className="max-w-[180px] truncate py-0 text-[11px] text-slate-700" title={report.domain}>{report.domain || "—"}</TableCell>
+                        <TableCell className="whitespace-nowrap py-0 text-[11px] text-slate-600">{formatDate(report.date_begin)} – {formatDate(report.date_end)}</TableCell>
+                        <TableCell className="whitespace-nowrap py-0 text-[11px] text-slate-600">{formatDate(report.created_at)}</TableCell>
                         <TableCell className="py-0 text-[11px] font-semibold text-slate-950">{formatNumber(report.message_count)}</TableCell>
                         <TableCell className="py-0 text-[11px] text-slate-500">{formatNumber(report.record_count)}</TableCell>
-                        <TableCell className="max-w-[220px] truncate py-0 text-[11px] text-slate-400" title={report.filename}>{report.filename || "\u2014"}</TableCell>
+                        <TableCell className="max-w-[220px] truncate py-0 text-[11px] text-slate-400" title={report.filename}>{report.filename || "—"}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
