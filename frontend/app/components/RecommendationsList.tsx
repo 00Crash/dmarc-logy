@@ -1,9 +1,7 @@
 "use client";
 
-import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, ShieldAlert } from "lucide-react";
-import { useMemo, useState } from "react";
+import { AlertTriangle, CheckCircle2, ShieldAlert } from "lucide-react";
 import { Recommendation, priorityClass } from "../lib";
-import { Button } from "./ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "./ui/table";
 
@@ -15,14 +13,10 @@ function priorityLabel(value: string) {
 }
 
 export default function RecommendationsList({ recommendations }: { recommendations: Recommendation[] }) {
-  const pageSize = 4;
-  const [page, setPage] = useState(1);
-  const totalPages = Math.max(1, Math.ceil(recommendations.length / pageSize));
-  const safePage = Math.min(page, totalPages);
-  const paged = useMemo(() => recommendations.slice((safePage - 1) * pageSize, safePage * pageSize), [recommendations, safePage]);
+  const first4 = recommendations.slice(0, 4);
 
   return (
-    <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden shadow-none">
+    <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden shadow-none">
       <CardHeader className="border-b border-slate-100 px-4 py-2">
         <div className="flex items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-sm font-semibold">
@@ -34,7 +28,7 @@ export default function RecommendationsList({ recommendations }: { recommendatio
       </CardHeader>
 
       <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-auto">
+        <TableWrapper className="h-full overflow-hidden">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="hover:bg-slate-50">
@@ -51,7 +45,7 @@ export default function RecommendationsList({ recommendations }: { recommendatio
                     <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} className="text-blue-600" />Zatím nejsou doporučení.</span>
                   </TableCell>
                 </TableRow>
-              ) : paged.map((item, index) => (
+              ) : first4.map((item, index) => (
                 <TableRow key={`${item.source_ip}-${index}`} className="h-[41px]">
                   <TableCell className="py-2"><span className={priorityClass(item.priority)}><AlertTriangle size={13} />{priorityLabel(item.priority)}</span></TableCell>
                   <TableCell className="py-2 font-mono text-xs font-medium text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</TableCell>
@@ -63,18 +57,6 @@ export default function RecommendationsList({ recommendations }: { recommendatio
           </Table>
         </TableWrapper>
       </CardContent>
-
-      <div className="flex items-center justify-between border-t border-slate-100 px-4 py-2 text-xs text-slate-500">
-        <span>Strana {safePage} / {totalPages} · 4 řádky</span>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" className="h-8" disabled={safePage <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
-            <ChevronLeft size={14} />
-          </Button>
-          <Button variant="outline" size="sm" className="h-8" disabled={safePage >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>
-            <ChevronRight size={14} />
-          </Button>
-        </div>
-      </div>
     </Card>
   );
 }
