@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "./ui/table";
 
 function priorityLabel(value: string) {
-  if (value === "critical") return "kritick\u00e1";
-  if (value === "medium") return "st\u0159edn\u00ed";
-  if (value === "low") return "n\u00edzk\u00e1";
+  if (value === "critical") return "kritická";
+  if (value === "medium") return "střední";
+  if (value === "low") return "nízká";
   return value;
 }
 
@@ -31,18 +31,18 @@ export default function RecommendationsList({ recommendations }: { recommendatio
         <TableWrapper className="h-full overflow-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
-              <TableRow className="hover:bg-slate-50">
+              <TableRow className="hover:bg-transparent">
                 <TableHead className="py-1 text-[11px]">Priorita</TableHead>
                 <TableHead className="py-1 text-[11px]">Zdroj</TableHead>
                 <TableHead className="py-1 text-[11px]">Problém</TableHead>
-                <TableHead className="py-1 text-[11px]">Doporučené akce</TableHead>
+                <TableHead className="py-1 text-[11px]">Doporučená akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recommendations.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-[120px] text-center text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-blue-600" />Zat\u00edm nejsou doporu\u010den\u00ed.</span>
+                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-blue-600" />Zatím nejsou doporučení.</span>
                   </TableCell>
                 </TableRow>
               ) : first4.map((item, index) => (

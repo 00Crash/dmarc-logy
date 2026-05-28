@@ -95,7 +95,7 @@ export default function ImportActions({ onDone }: Props) {
           title={file?.name || "Vybrat soubor (.xml/.zip/.gz)"}
         >
           <UploadCloud size={12} className="shrink-0 text-slate-400" />
-          <span className="truncate text-[11px]">{file ? file.name : "Vybrat soubor\u2026"}</span>
+          <span className="truncate text-[11px]">{file ? file.name : "Vybrat soubor…"}</span>
         </Button>
 
         {file && (
@@ -105,7 +105,7 @@ export default function ImportActions({ onDone }: Props) {
             variant="ghost"
             className="h-7 w-7 shrink-0 p-0 text-slate-400 hover:text-slate-700"
             onClick={clearFile}
-            title="Zru\u0161it v\u00fdb\u011br"
+            title="Zrušit výběr"
           >
             <X size={12} />
           </Button>
@@ -118,7 +118,7 @@ export default function ImportActions({ onDone }: Props) {
           disabled={loading}
         >
           {loading ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
-          Nahr\u00e1t
+          Nahrát
         </Button>
 
         <Button size="sm" className="h-7 shrink-0 px-3" variant="secondary" onClick={runImap} disabled={loading}>

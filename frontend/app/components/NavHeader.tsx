@@ -25,7 +25,7 @@ export default function NavHeader() {
         <p className="hidden text-xs text-slate-400 lg:block">DMARC, SPF a DKIM</p>
       </div>
 
-      <nav className="flex items-center gap-1" aria-label="Hlavn\u00ed menu">
+      <nav className="flex items-center gap-1" aria-label="Hlavní menu">
         {links.map(({ href, label, Icon }) => {
           const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
@@ -44,7 +44,7 @@ export default function NavHeader() {
         })}
         <Button variant="ghost" size="sm" className="h-7 px-2.5 text-xs text-slate-500 hover:bg-blue-50 hover:text-blue-700" onClick={logout}>
           <LogOut size={13} />
-          Odhl\u00e1sit
+          Odhlásit
         </Button>
       </nav>
     </header>
