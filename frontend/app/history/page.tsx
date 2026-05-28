@@ -163,13 +163,13 @@ function HistoryContent() {
                       <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={7}>Zatím nejsou importované reporty.</TableCell></TableRow>
                     ) : pagedReports.map((report, i) => (
                       <TableRow key={`${report.report_id}-${i}`} className="h-[26px]">
-                        <TableCell className="max-w-[200px] truncate py-0 text-[11px] font-medium text-slate-950" title={report.org_name}>{report.org_name || "—"}</TableCell>
-                        <TableCell className="max-w-[180px] truncate py-0 text-[11px] text-slate-700" title={report.domain}>{report.domain || "—"}</TableCell>
+                        <TableCell className="max-w-[200px] truncate py-0 text-[11px] font-medium text-slate-950" title={report.org_name ?? ""}>{report.org_name || "—"}</TableCell>
+                        <TableCell className="max-w-[180px] truncate py-0 text-[11px] text-slate-700" title={report.domain ?? ""}>{report.domain || "—"}</TableCell>
                         <TableCell className="whitespace-nowrap py-0 text-[11px] text-slate-600">{formatDate(report.date_begin)} – {formatDate(report.date_end)}</TableCell>
                         <TableCell className="whitespace-nowrap py-0 text-[11px] text-slate-600">{formatDate(report.created_at)}</TableCell>
-                        <TableCell className="py-0 text-[11px] font-semibold text-slate-950">{formatNumber(report.message_count)}</TableCell>
-                        <TableCell className="py-0 text-[11px] text-slate-500">{formatNumber(report.record_count)}</TableCell>
-                        <TableCell className="max-w-[220px] truncate py-0 text-[11px] text-slate-400" title={report.filename}>{report.filename || "—"}</TableCell>
+                        <TableCell className="py-0 text-[11px] font-semibold text-slate-950">{formatNumber(report.messages)}</TableCell>
+                        <TableCell className="py-0 text-[11px] text-slate-500">{formatNumber(report.records)}</TableCell>
+                        <TableCell className="max-w-[220px] truncate py-0 text-[11px] text-slate-400" title={report.source_filename ?? ""}>{report.source_filename || "—"}</TableCell>
                       </TableRow>
                     ))}
                   </TableBody>
