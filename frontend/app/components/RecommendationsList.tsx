@@ -28,7 +28,7 @@ export default function RecommendationsList({ recommendations }: { recommendatio
       </CardHeader>
 
       <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-hidden">
+        <TableWrapper className="h-full overflow-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
