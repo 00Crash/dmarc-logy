@@ -21,7 +21,7 @@ export default function RecommendationsList({ recommendations }: { recommendatio
         <div className="flex items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-xs font-semibold">
             <ShieldAlert size={14} className="text-blue-600" />
-            Doporu\u010den\u00ed
+            Doporučení
           </CardTitle>
           <div className="text-xs text-slate-500">{recommendations.length}</div>
         </div>
@@ -34,8 +34,8 @@ export default function RecommendationsList({ recommendations }: { recommendatio
               <TableRow className="hover:bg-slate-50">
                 <TableHead className="py-1 text-[11px]">Priorita</TableHead>
                 <TableHead className="py-1 text-[11px]">Zdroj</TableHead>
-                <TableHead className="py-1 text-[11px]">Probl\u00e9m</TableHead>
-                <TableHead className="py-1 text-[11px]">Doporu\u010den\u00e1 akce</TableHead>
+                <TableHead className="py-1 text-[11px]">Problém</TableHead>
+                <TableHead className="py-1 text-[11px]">Doporučené akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>

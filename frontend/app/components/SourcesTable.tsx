@@ -15,11 +15,11 @@ type Props = {
 };
 
 const CLASSIFICATION_OPTIONS = [
-  { value: "known", label: "zn\u00e1m\u00fd" },
-  { value: "unknown", label: "nezn\u00e1m\u00fd" },
-  { value: "suspicious", label: "podez\u0159el\u00fd" },
-  { value: "ignored", label: "ignorovan\u00fd" },
-  { value: "needs_fix", label: "vy\u017eaduje opravu" }
+  { value: "known", label: "známý" },
+  { value: "unknown", label: "neznámý" },
+  { value: "suspicious", label: "podezdřelý" },
+  { value: "ignored", label: "ignorován" },
+  { value: "needs_fix", label: "vyžaduje opravu" }
 ];
 
 export default function SourcesTable({ sources, loading = false, onClassificationChange }: Props) {
