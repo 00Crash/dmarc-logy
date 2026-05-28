@@ -1,6 +1,6 @@
 "use client";
 
-import { Inbox, Loader2, UploadCloud } from "lucide-react";
+import { FileUp, Inbox, Loader2, UploadCloud } from "lucide-react";
 import { useRef, useState } from "react";
 import { Badge } from "./ui/badge";
 import { Button } from "./ui/button";
@@ -64,17 +64,18 @@ export default function ImportActions({ onDone }: Props) {
   }
 
   return (
-    <Card className="h-full shadow-none">
-      <CardContent className="flex h-full min-w-0 items-center gap-2 p-3">
-        <div className="flex shrink-0 items-center gap-2 text-sm font-semibold text-slate-950">
+    <Card className="h-full overflow-hidden shadow-none">
+      <CardContent className="flex h-full min-w-0 items-center gap-2 p-2.5">
+        <div className="flex h-10 shrink-0 items-center gap-2 rounded-xl px-2 text-sm font-semibold text-slate-950">
           <UploadCloud size={16} className="text-blue-600" />
           Import
         </div>
 
-        <label className="flex min-w-0 flex-1 cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 bg-white px-3 py-2 text-xs font-semibold text-slate-950 transition hover:border-blue-500 hover:bg-blue-50/60">
+        <label className="group flex h-10 min-w-0 flex-1 cursor-pointer items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-3 text-xs font-semibold text-slate-950 transition hover:border-blue-300 hover:bg-blue-50">
           <input ref={fileInputRef} className="sr-only" type="file" accept=".xml,.zip,.gz" onChange={(event) => selectFile(event.target.files?.[0])} />
-          <UploadCloud size={16} className="shrink-0 text-blue-600" />
-          <span className="truncate">{file ? file.name : "Vybrat soubor"}</span>
+          <FileUp size={15} className="shrink-0 text-blue-600" />
+          <span className="min-w-0 flex-1 truncate text-left">{file ? file.name : "Vybrat XML / ZIP / GZ"}</span>
+          <span className="hidden shrink-0 text-[10px] font-semibold uppercase tracking-wide text-slate-400 2xl:inline">soubor</span>
         </label>
 
         {(message || error) && (
@@ -83,11 +84,11 @@ export default function ImportActions({ onDone }: Props) {
           </Badge>
         )}
 
-        <Button size="sm" className="h-9 shrink-0 px-3" onClick={upload} disabled={!file || loading}>
+        <Button size="sm" className="h-10 shrink-0 px-3" onClick={upload} disabled={!file || loading}>
           {loading ? <Loader2 size={14} className="animate-spin" /> : <UploadCloud size={14} />}
           Nahrát
         </Button>
-        <Button size="sm" className="h-9 shrink-0 px-3" variant="secondary" onClick={runImap} disabled={loading}>
+        <Button size="sm" className="h-10 shrink-0 px-3" variant="secondary" onClick={runImap} disabled={loading}>
           {loading ? <Loader2 size={14} className="animate-spin" /> : <Inbox size={14} />}
           IMAP
         </Button>
