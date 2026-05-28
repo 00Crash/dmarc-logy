@@ -28,14 +28,14 @@ export default function RecommendationsList({ recommendations }: { recommendatio
       </CardHeader>
 
       <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-auto">
+        <TableWrapper className="h-full overflow-hidden">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="py-1 text-[11px]">Priorita</TableHead>
-                <TableHead className="py-1 text-[11px]">Zdroj</TableHead>
-                <TableHead className="py-1 text-[11px]">Problém</TableHead>
-                <TableHead className="py-1 text-[11px]">Doporučená akce</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Priorita</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Zdroj</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Problém</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Doporučená akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -46,7 +46,7 @@ export default function RecommendationsList({ recommendations }: { recommendatio
                   </TableCell>
                 </TableRow>
               ) : first4.map((item, index) => (
-                <TableRow key={`${item.source_ip}-${index}`} className="h-[33px]">
+                <TableRow key={`${item.source_ip}-${index}`} className="h-[38px]">
                   <TableCell className="py-1"><span className={priorityClass(item.priority)}><AlertTriangle size={11} />{priorityLabel(item.priority)}</span></TableCell>
                   <TableCell className="py-1 font-mono text-[11px] font-medium text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</TableCell>
                   <TableCell className="max-w-[260px] truncate py-1 text-xs font-medium text-slate-950" title={item.title}>{item.title}</TableCell>

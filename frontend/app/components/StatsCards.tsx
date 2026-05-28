@@ -12,7 +12,7 @@ function StatCard({ label, value, helper, icon }: { label: string; value: string
           <div className="mt-0.5 truncate text-sm font-semibold tracking-tight text-slate-950">{value}</div>
           <p className="mt-0 truncate text-[10px] leading-tight text-slate-500">{helper}</p>
         </div>
-        <div className="flex h-full items-center text-blue-600">{icon}</div>
+        <div className="flex h-full items-center border-l border-slate-100 pl-2 text-blue-600">{icon}</div>
       </CardContent>
     </Card>
   );
@@ -20,7 +20,7 @@ function StatCard({ label, value, helper, icon }: { label: string; value: string
 
 export default function StatsCards({ dashboard }: { dashboard: Dashboard }) {
   return (
-    <section className="grid h-full min-h-0 grid-cols-6 gap-2">
+    <section className="flex h-full min-h-0 gap-2">
       <StatCard label="Celkem zpráv" value={formatNumber(dashboard.total_messages)} helper="Součet count." icon={<MailCheck size={15} />} />
       <StatCard label="DMARC pass" value={`${dashboard.dmarc_pass_rate} %`} helper={`${formatNumber(dashboard.dmarc_pass_count)} pass / ${formatNumber(dashboard.dmarc_fail_count)} fail.`} icon={<ShieldCheck size={15} />} />
       <StatCard label="Zdroje" value={formatNumber(dashboard.unique_sources)} helper={`${formatNumber(dashboard.unknown_sources)} neznámé.`} icon={<Server size={15} />} />

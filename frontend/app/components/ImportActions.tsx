@@ -72,7 +72,7 @@ export default function ImportActions({ onDone }: Props) {
 
   return (
     <Card className="h-full overflow-hidden shadow-none">
-      <CardContent className="flex h-full min-w-0 items-center gap-2 px-3 py-0">
+      <CardContent className="flex h-full w-full min-w-0 items-center gap-2 px-3 py-0">
         <div className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-950">
           <UploadCloud size={13} className="text-blue-600" />
           Import
@@ -86,11 +86,12 @@ export default function ImportActions({ onDone }: Props) {
           onChange={(event) => selectFile(event.target.files?.[0])}
         />
 
+        {/* Soubor button — roztáhne se na zbývající místo */}
         <Button
           type="button"
           size="sm"
           variant="outline"
-          className="h-7 min-w-0 flex-1 justify-start px-2"
+          className="h-7 min-w-0 flex-1 justify-start overflow-hidden px-2"
           onClick={() => fileInputRef.current?.click()}
           title={file?.name || "Vybrat soubor (.xml/.zip/.gz)"}
         >
@@ -127,7 +128,7 @@ export default function ImportActions({ onDone }: Props) {
         </Button>
 
         {(message || error) && (
-          <Badge variant={error ? "destructive" : "success"} className="shrink-0 max-w-[120px] truncate text-[10px]">
+          <Badge variant={error ? "destructive" : "success"} className="shrink-0 max-w-[140px] truncate text-[10px]">
             {message || error}
           </Badge>
         )}

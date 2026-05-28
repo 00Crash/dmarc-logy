@@ -117,7 +117,7 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 {["Zdroj", "Header From", "Provider", "Objem", "DMARC", "SPF", "DKIM", "SPF domény", "DKIM domény", "Stav"].map((head) => (
-                  <TableHead className="py-1 text-[11px]" key={head}>{head}</TableHead>
+                  <TableHead className="py-0.5 text-[11px]" key={head}>{head}</TableHead>
                 ))}
               </TableRow>
             </TableHeader>
@@ -128,40 +128,40 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
                 <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={10}>Žádný zdroj neodpovídá filtrům.</TableCell></TableRow>
               ) : filteredSources.map((source) => (
                 <Fragment key={source.source_key}>
-                  <TableRow className="h-[30px]">
-                    <TableCell className="py-0.5">
+                  <TableRow className="h-[26px]">
+                    <TableCell className="py-0">
                       <button
-                        className="inline-flex max-w-[220px] items-center gap-1 text-left text-xs font-medium text-slate-950"
+                        className="inline-flex max-w-[220px] items-center gap-1 text-left text-[11px] font-medium text-slate-950"
                         onClick={() => setExpandedSource(expandedSource === source.source_key ? null : source.source_key)}
                       >
-                        <ChevronDown size={11} className={expandedSource === source.source_key ? "rotate-180 transition" : "transition"} />
+                        <ChevronDown size={10} className={expandedSource === source.source_key ? "rotate-180 transition" : "transition"} />
                         <span className="break-all">{source.source_ip}</span>
                       </button>
-                      <small className="block max-w-[220px] truncate text-[10px] leading-tight text-slate-400">{source.reverse_dns || "bez reverse DNS"}</small>
+                      <small className="block max-w-[220px] truncate text-[9px] leading-tight text-slate-400">{source.reverse_dns || "bez reverse DNS"}</small>
                     </TableCell>
-                    <TableCell className="max-w-[170px] truncate py-0.5 text-xs font-medium text-slate-700" title={source.header_from}>{source.header_from || domains(source.header_from_domains)}</TableCell>
-                    <TableCell className="max-w-[230px] truncate py-0.5 text-xs text-slate-500" title={source.provider_name || "Neznámý"}>{source.provider_name || "Neznámý"}</TableCell>
-                    <TableCell className="py-0.5 text-xs font-semibold text-slate-950">{formatNumber(source.total_count)}</TableCell>
-                    <TableCell className="py-0.5">
+                    <TableCell className="max-w-[170px] truncate py-0 text-[11px] font-medium text-slate-700" title={source.header_from}>{source.header_from || domains(source.header_from_domains)}</TableCell>
+                    <TableCell className="max-w-[230px] truncate py-0 text-[11px] text-slate-500" title={source.provider_name || "Neznámý"}>{source.provider_name || "Neznámý"}</TableCell>
+                    <TableCell className="py-0 text-[11px] font-semibold text-slate-950">{formatNumber(source.total_count)}</TableCell>
+                    <TableCell className="py-0">
                       <span className={resultPill(source.dmarc)}>{resultLabel(source.dmarc)}</span>
-                      <div className="text-[10px] leading-tight text-slate-400">{source.dmarc_pass_rate} %</div>
+                      <div className="text-[9px] leading-tight text-slate-400">{source.dmarc_pass_rate} %</div>
                     </TableCell>
-                    <TableCell className="py-0.5">
+                    <TableCell className="py-0">
                       <span className={resultPill(source.spf)}>{resultLabel(source.spf)}</span>
-                      <div className="text-[10px] leading-tight text-slate-400">{formatNumber(source.spf_policy_pass_count)} / {formatNumber(source.spf_policy_fail_count)}</div>
+                      <div className="text-[9px] leading-tight text-slate-400">{formatNumber(source.spf_policy_pass_count)} / {formatNumber(source.spf_policy_fail_count)}</div>
                     </TableCell>
-                    <TableCell className="py-0.5">
+                    <TableCell className="py-0">
                       <span className={resultPill(source.dkim)}>{resultLabel(source.dkim)}</span>
-                      <div className="text-[10px] leading-tight text-slate-400">{formatNumber(source.dkim_policy_pass_count)} / {formatNumber(source.dkim_policy_fail_count)}</div>
+                      <div className="text-[9px] leading-tight text-slate-400">{formatNumber(source.dkim_policy_pass_count)} / {formatNumber(source.dkim_policy_fail_count)}</div>
                     </TableCell>
-                    <TableCell className="max-w-[170px] truncate py-0.5 text-xs text-slate-500" title={source.spf_domains?.join(", ")}>{domains(source.spf_domains)}</TableCell>
-                    <TableCell className="max-w-[170px] truncate py-0.5 text-xs text-slate-500" title={source.dkim_domains?.join(", ")}>{domains(source.dkim_domains)}</TableCell>
-                    <TableCell className="py-0.5">
+                    <TableCell className="max-w-[170px] truncate py-0 text-[11px] text-slate-500" title={source.spf_domains?.join(", ")}>{domains(source.spf_domains)}</TableCell>
+                    <TableCell className="max-w-[170px] truncate py-0 text-[11px] text-slate-500" title={source.dkim_domains?.join(", ")}>{domains(source.dkim_domains)}</TableCell>
+                    <TableCell className="py-0">
                       <select
                         value={source.classification}
                         onChange={(e) => onClassificationChange(source.source_id, source.source_ip, e.target.value)}
                         disabled={loading}
-                        className="h-7 rounded-lg border border-slate-200 bg-white px-2 text-[11px] text-slate-700 outline-none focus:border-slate-400 disabled:opacity-60"
+                        className="h-6 rounded-md border border-slate-200 bg-white px-1.5 text-[10px] text-slate-700 outline-none focus:border-slate-400 disabled:opacity-60"
                       >
                         {CLASSIFICATION_OPTIONS.map((o) => <option value={o.value} key={o.value}>{o.label}</option>)}
                       </select>
