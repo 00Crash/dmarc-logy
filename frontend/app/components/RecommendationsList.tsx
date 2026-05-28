@@ -16,8 +16,8 @@ export default function RecommendationsList({ recommendations }: { recommendatio
   const first4 = recommendations.slice(0, 4);
 
   return (
-    <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden shadow-none">
-      <CardHeader className="border-b border-slate-100 px-4 py-1.5">
+    <Card className="flex min-h-0 flex-col overflow-hidden shadow-none">
+      <CardHeader className="shrink-0 border-b border-slate-100 px-4 py-1.5">
         <div className="flex items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-xs font-semibold">
             <ShieldAlert size={14} className="text-blue-600" />
@@ -27,9 +27,9 @@ export default function RecommendationsList({ recommendations }: { recommendatio
         </div>
       </CardHeader>
 
-      <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-x-auto overflow-y-auto">
-          <Table className="min-w-[900px]">
+      <CardContent className="min-h-0 flex-1 overflow-auto p-0">
+        <TableWrapper className="min-w-[900px]">
+          <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="py-0.5 text-[11px]">Priorita</TableHead>
