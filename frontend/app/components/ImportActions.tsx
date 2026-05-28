@@ -72,74 +72,62 @@ export default function ImportActions({ onDone }: Props) {
 
   return (
     <Card className="h-full overflow-hidden shadow-none">
-      <CardContent className="flex h-full min-w-0 flex-col justify-center gap-2 p-3">
-        {/* Řádek 1: Label + IMAP tlačítko */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1.5 text-sm font-semibold text-slate-950">
-            <UploadCloud size={15} className="text-blue-600" />
-            Import
-          </div>
-          <Button
-            size="sm"
-            className="ml-auto h-8 shrink-0 px-3"
-            variant="secondary"
-            onClick={runImap}
-            disabled={loading}
-          >
-            {loading ? <Loader2 size={13} className="animate-spin" /> : <Inbox size={13} />}
-            IMAP
-          </Button>
+      <CardContent className="flex h-full min-w-0 items-center gap-2 px-3 py-0">
+        <div className="flex shrink-0 items-center gap-1.5 text-xs font-semibold text-slate-950">
+          <UploadCloud size={13} className="text-blue-600" />
+          Import
         </div>
 
-        {/* Řádek 2: Výběr souboru */}
-        <div className="flex items-center gap-2">
-          <input
-            ref={fileInputRef}
-            className="sr-only"
-            type="file"
-            accept=".xml,.zip,.gz"
-            onChange={(event) => selectFile(event.target.files?.[0])}
-          />
+        <input
+          ref={fileInputRef}
+          className="sr-only"
+          type="file"
+          accept=".xml,.zip,.gz"
+          onChange={(event) => selectFile(event.target.files?.[0])}
+        />
+
+        <Button
+          type="button"
+          size="sm"
+          variant="outline"
+          className="h-7 min-w-0 flex-1 justify-start px-2"
+          onClick={() => fileInputRef.current?.click()}
+          title={file?.name || "Vybrat soubor (.xml/.zip/.gz)"}
+        >
+          <UploadCloud size={12} className="shrink-0 text-slate-400" />
+          <span className="truncate text-[11px]">{file ? file.name : "Vybrat soubor\u2026"}</span>
+        </Button>
+
+        {file && (
           <Button
             type="button"
             size="sm"
-            variant="outline"
-            className="h-8 min-w-0 flex-1 justify-start px-2.5"
-            onClick={() => fileInputRef.current?.click()}
-            title={file?.name || "Vybrat soubor (.xml/.zip/.gz)"}
+            variant="ghost"
+            className="h-7 w-7 shrink-0 p-0 text-slate-400 hover:text-slate-700"
+            onClick={clearFile}
+            title="Zru\u0161it v\u00fdb\u011br"
           >
-            <UploadCloud size={13} className="shrink-0 text-slate-400" />
-            <span className="truncate text-xs">{file ? file.name : "Vybrat soubor…"}</span>
+            <X size={12} />
           </Button>
-          {file && (
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className="h-8 w-8 shrink-0 p-0 text-slate-400 hover:text-slate-700"
-              onClick={clearFile}
-              title="Zrušit výběr"
-            >
-              <X size={13} />
-            </Button>
-          )}
-          <Button
-            size="sm"
-            className="h-8 shrink-0 px-3"
-            onClick={file ? uploadSelectedFile : () => fileInputRef.current?.click()}
-            disabled={loading}
-          >
-            {loading ? <Loader2 size={13} className="animate-spin" /> : <UploadCloud size={13} />}
-            Nahrát
-          </Button>
-        </div>
+        )}
 
-        {/* Status badge */}
+        <Button
+          size="sm"
+          className="h-7 shrink-0 px-3"
+          onClick={file ? uploadSelectedFile : () => fileInputRef.current?.click()}
+          disabled={loading}
+        >
+          {loading ? <Loader2 size={12} className="animate-spin" /> : <UploadCloud size={12} />}
+          Nahr\u00e1t
+        </Button>
+
+        <Button size="sm" className="h-7 shrink-0 px-3" variant="secondary" onClick={runImap} disabled={loading}>
+          {loading ? <Loader2 size={12} className="animate-spin" /> : <Inbox size={12} />}
+          IMAP
+        </Button>
+
         {(message || error) && (
-          <Badge
-            variant={error ? "destructive" : "success"}
-            className="w-full justify-center truncate text-center"
-          >
+          <Badge variant={error ? "destructive" : "success"} className="shrink-0 max-w-[120px] truncate text-[10px]">
             {message || error}
           </Badge>
         )}
