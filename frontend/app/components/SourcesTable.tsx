@@ -100,12 +100,12 @@ export default function SourcesTable({ sources, loading = false, onClassificatio
             <Button
               variant="outline"
               size="sm"
-              className="h-7 w-7 p-0"
+              className="inline-flex h-7 w-7 items-center justify-center p-0"
               onClick={resetFilters}
               disabled={!activeFilters}
               title="Resetovat filtry"
             >
-              <RotateCcw size={12} />
+              <RotateCcw className="h-3 w-3" />
             </Button>
           </div>
         </div>
