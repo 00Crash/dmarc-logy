@@ -3,180 +3,208 @@
 import { AlertCircle, CalendarClock, ChevronLeft, ChevronRight, FileText } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import AuthGate from "../components/AuthGate";
-import AppVersionFooter from "../components/AppVersionFooter";
 import NavHeader from "../components/NavHeader";
 import { Button } from "../components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
+import { Card, CardContent, CardTitle } from "../components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "../components/ui/table";
 import { Dashboard, ReportRow, TimelineMode, emptyDashboard, formatDate, formatNumber, percent } from "../lib";
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50, 100];
 
-function Pager({ page, totalPages, total, pageSize, setPage, setPageSize }: { page: number; totalPages: number; total: number; pageSize: number; setPage: (value: number | ((current: number) => number)) => void; setPageSize: (value: number) => void }) {
-    return (
-        <div className="flex flex-col gap-3 border-t border-slate-100 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-            <div className="flex flex-col gap-3 text-sm text-slate-500 sm:flex-row sm:items-center">
-                <span>Strana {page} / {totalPages} · {total} záznamů</span>
-                <label className="flex items-center gap-2">
-                    <span>Na stránku</span>
-                    <select value={pageSize} onChange={(event) => { setPageSize(Number(event.target.value)); setPage(1); }} className="h-9 rounded-xl border border-slate-200 bg-white px-2 text-sm text-slate-700 outline-none focus:border-slate-400">
-                        {PAGE_SIZE_OPTIONS.map((value) => <option key={value} value={value}>{value}</option>)}
-                    </select>
-                </label>
-            </div>
-            <div className="flex gap-2">
-                <Button variant="outline" size="sm" disabled={page <= 1} onClick={() => setPage((value) => Math.max(1, value - 1))}>
-                    <ChevronLeft size={15} /> Zpět
-                </Button>
-                <Button variant="outline" size="sm" disabled={page >= totalPages} onClick={() => setPage((value) => Math.min(totalPages, value + 1))}>
-                    Další <ChevronRight size={15} />
-                </Button>
-            </div>
-        </div>
-    );
+function Pager({ page, totalPages, total, pageSize, setPage, setPageSize }: {
+  page: number;
+  totalPages: number;
+  total: number;
+  pageSize: number;
+  setPage: (value: number | ((current: number) => number)) => void;
+  setPageSize: (value: number) => void;
+}) {
+  return (
+    <div className="flex items-center justify-between border-t border-slate-100 px-4 py-1.5">
+      <div className="flex items-center gap-3 text-[11px] text-slate-500">
+        <span>Strana {page} / {totalPages} \u00b7 {total} z\u00e1znam\u016f</span>
+        <label className="flex items-center gap-1.5">
+          Na str\u00e1nku
+          <select
+            value={pageSize}
+            onChange={(e) => { setPageSize(Number(e.target.value)); setPage(1); }}
+            className="h-6 rounded-md border border-slate-200 bg-white px-1.5 text-[11px] text-slate-700 outline-none focus:border-slate-400"
+          >
+            {PAGE_SIZE_OPTIONS.map((v) => <option key={v} value={v}>{v}</option>)}
+          </select>
+        </label>
+      </div>
+      <div className="flex gap-1">
+        <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" disabled={page <= 1} onClick={() => setPage((v) => Math.max(1, v - 1))}>
+          <ChevronLeft size={11} /> Zp\u011bt
+        </Button>
+        <Button variant="outline" size="sm" className="h-6 px-2 text-[11px]" disabled={page >= totalPages} onClick={() => setPage((v) => Math.min(totalPages, v + 1))}>
+          Dal\u0161\u00ed <ChevronRight size={11} />
+        </Button>
+      </div>
+    </div>
+  );
 }
 
 function HistoryContent() {
-    const [timelineMode, setTimelineMode] = useState<TimelineMode>("report");
-    const [dashboard, setDashboard] = useState<Dashboard>(emptyDashboard);
-    const [reports, setReports] = useState<ReportRow[]>([]);
-    const [error, setError] = useState("");
-    const [timelinePage, setTimelinePage] = useState(1);
-    const [timelinePageSize, setTimelinePageSize] = useState(10);
-    const [reportsPage, setReportsPage] = useState(1);
-    const [reportsPageSize, setReportsPageSize] = useState(10);
+  const [timelineMode, setTimelineMode] = useState<TimelineMode>("report");
+  const [dashboard, setDashboard] = useState<Dashboard>(emptyDashboard);
+  const [reports, setReports] = useState<ReportRow[]>([]);
+  const [error, setError] = useState("");
+  const [timelinePage, setTimelinePage] = useState(1);
+  const [timelinePageSize, setTimelinePageSize] = useState(25);
+  const [reportsPage, setReportsPage] = useState(1);
+  const [reportsPageSize, setReportsPageSize] = useState(25);
 
-    async function loadData(mode: TimelineMode = timelineMode) {
-        const [d, r] = await Promise.all([
-            fetch(`/api/dashboard?timeline_mode=${mode}`, { credentials: "include" }).then((res) => res.json()),
-            fetch("/api/reports", { credentials: "include" }).then((res) => res.json())
-        ]);
-        setDashboard(d);
-        setReports(r);
-    }
+  async function loadData(mode: TimelineMode = timelineMode) {
+    const [d, r] = await Promise.all([
+      fetch(`/api/dashboard?timeline_mode=${mode}`, { credentials: "include" }).then((res) => res.json()),
+      fetch("/api/reports", { credentials: "include" }).then((res) => res.json())
+    ]);
+    setDashboard(d);
+    setReports(r);
+  }
 
-    useEffect(() => {
-        loadData(timelineMode).catch((err) => setError(String(err)));
-    }, [timelineMode]);
+  useEffect(() => {
+    loadData(timelineMode).catch((err) => setError(String(err)));
+  }, [timelineMode]);
 
-    const timelineRows = useMemo(() => [...dashboard.timeline].sort((a, b) => b.date.localeCompare(a.date)), [dashboard.timeline]);
-    const timelineTotalPages = Math.max(1, Math.ceil(timelineRows.length / timelinePageSize));
-    const safeTimelinePage = Math.min(timelinePage, timelineTotalPages);
-    const pagedTimelineRows = timelineRows.slice((safeTimelinePage - 1) * timelinePageSize, safeTimelinePage * timelinePageSize);
+  const timelineRows = useMemo(() => [...dashboard.timeline].sort((a, b) => b.date.localeCompare(a.date)), [dashboard.timeline]);
+  const timelineTotalPages = Math.max(1, Math.ceil(timelineRows.length / timelinePageSize));
+  const safeTimelinePage = Math.min(timelinePage, timelineTotalPages);
+  const pagedTimelineRows = timelineRows.slice((safeTimelinePage - 1) * timelinePageSize, safeTimelinePage * timelinePageSize);
 
-    const sortedReports = useMemo(() => {
-        return [...reports].sort((a, b) => {
-            const importCmp = (b.created_at || "").localeCompare(a.created_at || "");
-            if (importCmp !== 0) return importCmp;
-            const beginCmp = (b.date_begin || "").localeCompare(a.date_begin || "");
-            if (beginCmp !== 0) return beginCmp;
-            return (b.date_end || "").localeCompare(a.date_end || "");
-        });
-    }, [reports]);
-    const reportsTotalPages = Math.max(1, Math.ceil(sortedReports.length / reportsPageSize));
-    const safeReportsPage = Math.min(reportsPage, reportsTotalPages);
-    const pagedReports = sortedReports.slice((safeReportsPage - 1) * reportsPageSize, safeReportsPage * reportsPageSize);
+  const sortedReports = useMemo(() => {
+    return [...reports].sort((a, b) => {
+      const importCmp = (b.created_at || "").localeCompare(a.created_at || "");
+      if (importCmp !== 0) return importCmp;
+      const beginCmp = (b.date_begin || "").localeCompare(a.date_begin || "");
+      if (beginCmp !== 0) return beginCmp;
+      return (b.date_end || "").localeCompare(a.date_end || "");
+    });
+  }, [reports]);
+  const reportsTotalPages = Math.max(1, Math.ceil(sortedReports.length / reportsPageSize));
+  const safeReportsPage = Math.min(reportsPage, reportsTotalPages);
+  const pagedReports = sortedReports.slice((safeReportsPage - 1) * reportsPageSize, safeReportsPage * reportsPageSize);
 
-    return (
-        <main className="min-h-screen bg-white px-4 py-4 text-slate-950 sm:px-6">
-            <div className="mx-auto flex min-h-[calc(100vh-2rem)] max-w-[1680px] flex-col gap-6">
-                <NavHeader />
+  return (
+    <main className="h-screen overflow-hidden bg-white px-4 py-2 text-slate-950">
+      <div className="mx-auto grid h-full max-w-[1840px] grid-rows-[auto_minmax(0,1fr)] gap-2">
+        <NavHeader />
 
-                {error && (
-                    <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700 shadow-none">
-                        <AlertCircle size={18} />
-                        {error}
-                    </Card>
-                )}
+        {error && (
+          <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 shadow-none">
+            <AlertCircle size={15} />
+            {error}
+          </Card>
+        )}
 
-                <div className="grid flex-1 gap-6 lg:grid-rows-2">
-                    <Card className="overflow-hidden shadow-none">
-                        <CardHeader className="border-b border-slate-100">
-                            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-                                <div>
-                                    <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                                        <CalendarClock size={18} className="text-blue-600" />
-                                        Vývoj v čase
-                                    </CardTitle>
-                                    <CardDescription className="mt-2">{timelineMode === "report" ? "Podle období uvnitř DMARC XML reportů." : "Podle data importu."}</CardDescription>
-                                </div>
-                                <div className="inline-flex rounded-xl border border-slate-200 p-1">
-                                    <Button variant={timelineMode === "report" ? "default" : "ghost"} size="sm" onClick={() => { setTimelineMode("report"); setTimelinePage(1); }}>Období reportu</Button>
-                                    <Button variant={timelineMode === "import" ? "default" : "ghost"} size="sm" onClick={() => { setTimelineMode("import"); setTimelinePage(1); }}>Datum importu</Button>
-                                </div>
-                            </div>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <TableWrapper className="max-h-[360px]">
-                                <Table className="min-w-[760px]">
-                                    <TableHeader>
-                                        <TableRow className="hover:bg-slate-50"><TableHead>Datum</TableHead><TableHead>Celkem</TableHead><TableHead>Pass</TableHead><TableHead>Fail</TableHead><TableHead>Pass rate</TableHead></TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {timelineRows.length === 0 ? (
-                                            <TableRow><TableCell className="py-10 text-center text-slate-500" colSpan={5}>Zatím nejsou importovaná data.</TableCell></TableRow>
-                                        ) : pagedTimelineRows.map((row) => (
-                                            <TableRow key={row.date}>
-                                                <TableCell className="whitespace-nowrap font-medium text-slate-950">{row.date}</TableCell>
-                                                <TableCell>{formatNumber(row.total)}</TableCell>
-                                                <TableCell>{formatNumber(row.pass)}</TableCell>
-                                                <TableCell>{formatNumber(row.fail)}</TableCell>
-                                                <TableCell className="font-medium text-slate-950">{percent(row.pass, row.total)} %</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableWrapper>
-                            <Pager page={safeTimelinePage} totalPages={timelineTotalPages} total={timelineRows.length} pageSize={timelinePageSize} setPage={setTimelinePage} setPageSize={setTimelinePageSize} />
-                        </CardContent>
-                    </Card>
+        <div className="grid min-h-0 grid-rows-2 gap-2">
 
-                    <Card className="overflow-hidden shadow-none">
-                        <CardHeader className="border-b border-slate-100">
-                            <CardTitle className="flex items-center gap-2 text-lg font-semibold">
-                                <FileText size={18} className="text-blue-600" />
-                                Importované reporty
-                            </CardTitle>
-                            <CardDescription>Období reportu a datum importu jsou zobrazené odděleně.</CardDescription>
-                        </CardHeader>
-                        <CardContent className="p-0">
-                            <TableWrapper className="max-h-[420px]">
-                                <Table className="min-w-[1080px]">
-                                    <TableHeader>
-                                        <TableRow className="hover:bg-slate-50"><TableHead>Organizace</TableHead><TableHead>Doména</TableHead><TableHead>Období reportu</TableHead><TableHead>Datum importu</TableHead><TableHead>Zprávy</TableHead><TableHead>Záznamy</TableHead><TableHead>Soubor</TableHead></TableRow>
-                                    </TableHeader>
-                                    <TableBody>
-                                        {reports.length === 0 ? (
-                                            <TableRow><TableCell className="py-10 text-center text-slate-500" colSpan={7}>Zatím nejsou importované reporty.</TableCell></TableRow>
-                                        ) : pagedReports.map((report) => (
-                                            <TableRow key={report.id}>
-                                                <TableCell className="max-w-[210px] truncate font-medium text-slate-700">{report.org_name || "-"}</TableCell>
-                                                <TableCell className="max-w-[170px] truncate font-medium text-slate-950">{report.domain || "-"}</TableCell>
-                                                <TableCell className="whitespace-nowrap">{formatDate(report.date_begin)} až {formatDate(report.date_end)}</TableCell>
-                                                <TableCell className="whitespace-nowrap">{formatDate(report.created_at)}</TableCell>
-                                                <TableCell className="font-medium text-slate-950">{formatNumber(report.messages)}</TableCell>
-                                                <TableCell>{formatNumber(report.records)}</TableCell>
-                                                <TableCell className="max-w-[360px] break-words text-slate-500">{report.source_filename || "-"}</TableCell>
-                                            </TableRow>
-                                        ))}
-                                    </TableBody>
-                                </Table>
-                            </TableWrapper>
-                            <Pager page={safeReportsPage} totalPages={reportsTotalPages} total={sortedReports.length} pageSize={reportsPageSize} setPage={setReportsPage} setPageSize={setReportsPageSize} />
-                        </CardContent>
-                    </Card>
-                </div>
-
-                <AppVersionFooter />
+          {/* Vývoj v čase */}
+          <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden shadow-none">
+            <div className="flex items-center justify-between border-b border-slate-100 px-4 py-1.5">
+              <CardTitle className="flex items-center gap-2 text-xs font-semibold">
+                <CalendarClock size={14} className="text-blue-600" />
+                V\u00fdvoj v \u010dase
+              </CardTitle>
+              <div className="inline-flex rounded-lg border border-slate-200 p-0.5">
+                <Button
+                  variant={timelineMode === "report" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-6 px-2.5 text-[11px]"
+                  onClick={() => { setTimelineMode("report"); setTimelinePage(1); }}
+                >
+                  Obdob\u00ed reportu
+                </Button>
+                <Button
+                  variant={timelineMode === "import" ? "default" : "ghost"}
+                  size="sm"
+                  className="h-6 px-2.5 text-[11px]"
+                  onClick={() => { setTimelineMode("import"); setTimelinePage(1); }}
+                >
+                  Datum importu
+                </Button>
+              </div>
             </div>
-        </main>
-    );
+            <CardContent className="min-h-0 p-0">
+              <TableWrapper className="h-full overflow-auto">
+                <Table className="min-w-[600px]">
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      {["Datum", "Celkem", "Pass", "Fail", "Pass rate"].map((h) => (
+                        <TableHead className="py-0.5 text-[11px]" key={h}>{h}</TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {timelineRows.length === 0 ? (
+                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={5}>Zat\u00edm nejsou importovan\u00e1 data.</TableCell></TableRow>
+                    ) : pagedTimelineRows.map((row) => (
+                      <TableRow key={row.date} className="h-[26px]">
+                        <TableCell className="py-0 text-[11px] font-medium text-slate-950 whitespace-nowrap">{row.date}</TableCell>
+                        <TableCell className="py-0 text-[11px]">{formatNumber(row.total)}</TableCell>
+                        <TableCell className="py-0 text-[11px]">{formatNumber(row.pass)}</TableCell>
+                        <TableCell className="py-0 text-[11px]">{formatNumber(row.fail)}</TableCell>
+                        <TableCell className="py-0 text-[11px] font-medium text-slate-950">{percent(row.pass, row.total)} %</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableWrapper>
+            </CardContent>
+            <Pager page={safeTimelinePage} totalPages={timelineTotalPages} total={timelineRows.length} pageSize={timelinePageSize} setPage={setTimelinePage} setPageSize={setTimelinePageSize} />
+          </Card>
+
+          {/* Importované reporty */}
+          <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] overflow-hidden shadow-none">
+            <div className="flex items-center border-b border-slate-100 px-4 py-1.5">
+              <CardTitle className="flex items-center gap-2 text-xs font-semibold">
+                <FileText size={14} className="text-blue-600" />
+                Importovan\u00e9 reporty
+              </CardTitle>
+            </div>
+            <CardContent className="min-h-0 p-0">
+              <TableWrapper className="h-full overflow-auto">
+                <Table className="min-w-[1080px]">
+                  <TableHeader>
+                    <TableRow className="hover:bg-transparent">
+                      {["Organizace", "Dom\u00e9na", "Obdob\u00ed reportu", "Datum importu", "Zpr\u00e1vy", "Z\u00e1znamy", "Soubor"].map((h) => (
+                        <TableHead className="py-0.5 text-[11px]" key={h}>{h}</TableHead>
+                      ))}
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {reports.length === 0 ? (
+                      <TableRow><TableCell className="py-8 text-center text-xs text-slate-500" colSpan={7}>Zat\u00edm nejsou importovan\u00e9 reporty.</TableCell></TableRow>
+                    ) : pagedReports.map((report, i) => (
+                      <TableRow key={`${report.report_id}-${i}`} className="h-[26px]">
+                        <TableCell className="max-w-[200px] truncate py-0 text-[11px] font-medium text-slate-950" title={report.org_name}>{report.org_name || "\u2014"}</TableCell>
+                        <TableCell className="max-w-[180px] truncate py-0 text-[11px] text-slate-700" title={report.domain}>{report.domain || "\u2014"}</TableCell>
+                        <TableCell className="py-0 text-[11px] text-slate-600 whitespace-nowrap">{formatDate(report.date_begin)} \u2013 {formatDate(report.date_end)}</TableCell>
+                        <TableCell className="py-0 text-[11px] text-slate-600 whitespace-nowrap">{formatDate(report.created_at)}</TableCell>
+                        <TableCell className="py-0 text-[11px] font-semibold text-slate-950">{formatNumber(report.message_count)}</TableCell>
+                        <TableCell className="py-0 text-[11px] text-slate-500">{formatNumber(report.record_count)}</TableCell>
+                        <TableCell className="max-w-[220px] truncate py-0 text-[11px] text-slate-400" title={report.filename}>{report.filename || "\u2014"}</TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </TableWrapper>
+            </CardContent>
+            <Pager page={safeReportsPage} totalPages={reportsTotalPages} total={sortedReports.length} pageSize={reportsPageSize} setPage={setReportsPage} setPageSize={setReportsPageSize} />
+          </Card>
+
+        </div>
+      </div>
+    </main>
+  );
 }
 
 export default function HistoryPage() {
-    return (
-        <AuthGate>
-            <HistoryContent />
-        </AuthGate>
-    );
+  return (
+    <AuthGate>
+      <HistoryContent />
+    </AuthGate>
+  );
 }

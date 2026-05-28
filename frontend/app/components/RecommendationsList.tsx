@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "./ui/table";
 
 function priorityLabel(value: string) {
-  if (value === "critical") return "kritická";
-  if (value === "medium") return "střední";
-  if (value === "low") return "nízká";
+  if (value === "critical") return "kritick\u00e1";
+  if (value === "medium") return "st\u0159edn\u00ed";
+  if (value === "low") return "n\u00edzk\u00e1";
   return value;
 }
 
@@ -21,28 +21,28 @@ export default function RecommendationsList({ recommendations }: { recommendatio
         <div className="flex items-center justify-between gap-4">
           <CardTitle className="flex items-center gap-2 text-xs font-semibold">
             <ShieldAlert size={14} className="text-blue-600" />
-            Doporučení
+            Doporu\u010den\u00ed
           </CardTitle>
           <div className="text-xs text-slate-500">{recommendations.length}</div>
         </div>
       </CardHeader>
 
       <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-auto">
+        <TableWrapper className="h-full overflow-x-auto overflow-y-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="hover:bg-transparent">
                 <TableHead className="py-0.5 text-[11px]">Priorita</TableHead>
                 <TableHead className="py-0.5 text-[11px]">Zdroj</TableHead>
-                <TableHead className="py-0.5 text-[11px]">Problém</TableHead>
-                <TableHead className="py-0.5 text-[11px]">Doporučená akce</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Probl\u00e9m</TableHead>
+                <TableHead className="py-0.5 text-[11px]">Doporu\u010den\u00e1 akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recommendations.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={4} className="h-[120px] text-center text-xs text-slate-500">
-                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-blue-600" />Zatím nejsou doporučení.</span>
+                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-blue-600" />Zat\u00edm nejsou doporu\u010den\u00ed.</span>
                   </TableCell>
                 </TableRow>
               ) : first4.map((item, index) => (
