@@ -61,7 +61,7 @@ function HomeContent() {
           </Card>
         ) : null}
 
-        <div className="grid min-h-0 grid-rows-[86px_minmax(0,1fr)_246px] gap-3">
+        <div className="grid min-h-0 grid-rows-[86px_minmax(0,1fr)_210px] gap-3">
           <section className="grid min-h-0 gap-3 xl:grid-cols-[250px_minmax(0,1fr)]">
             <ImportActions onDone={loadData} />
             <StatsCards dashboard={dashboard} />

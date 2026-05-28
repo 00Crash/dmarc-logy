@@ -6,9 +6,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableWrapper } from "./ui/table";
 
 function priorityLabel(value: string) {
-  if (value === "critical") return "kritická";
-  if (value === "medium") return "střední";
-  if (value === "low") return "nízká";
+  if (value === "critical") return "kritick\u00e1";
+  if (value === "medium") return "st\u0159edn\u00ed";
+  if (value === "low") return "n\u00edzk\u00e1";
   return value;
 }
 
@@ -17,40 +17,40 @@ export default function RecommendationsList({ recommendations }: { recommendatio
 
   return (
     <Card className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] overflow-hidden shadow-none">
-      <CardHeader className="border-b border-slate-100 px-4 py-2">
+      <CardHeader className="border-b border-slate-100 px-4 py-1.5">
         <div className="flex items-center justify-between gap-4">
-          <CardTitle className="flex items-center gap-2 text-sm font-semibold">
-            <ShieldAlert size={16} className="text-blue-600" />
-            Doporučení
+          <CardTitle className="flex items-center gap-2 text-xs font-semibold">
+            <ShieldAlert size={14} className="text-blue-600" />
+            Doporu\u010den\u00ed
           </CardTitle>
           <div className="text-xs text-slate-500">{recommendations.length}</div>
         </div>
       </CardHeader>
 
       <CardContent className="min-h-0 p-0">
-        <TableWrapper className="h-full overflow-hidden">
+        <TableWrapper className="h-full overflow-auto">
           <Table className="min-w-[900px]">
             <TableHeader>
               <TableRow className="hover:bg-slate-50">
-                <TableHead className="py-2">Priorita</TableHead>
-                <TableHead className="py-2">Zdroj</TableHead>
-                <TableHead className="py-2">Problém</TableHead>
-                <TableHead className="py-2">Doporučená akce</TableHead>
+                <TableHead className="py-1 text-[11px]">Priorita</TableHead>
+                <TableHead className="py-1 text-[11px]">Zdroj</TableHead>
+                <TableHead className="py-1 text-[11px]">Probl\u00e9m</TableHead>
+                <TableHead className="py-1 text-[11px]">Doporu\u010den\u00e1 akce</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
               {recommendations.length === 0 ? (
                 <TableRow>
-                  <TableCell colSpan={4} className="h-[164px] text-center text-sm text-slate-500">
-                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={18} className="text-blue-600" />Zatím nejsou doporučení.</span>
+                  <TableCell colSpan={4} className="h-[120px] text-center text-xs text-slate-500">
+                    <span className="inline-flex items-center gap-2"><CheckCircle2 size={15} className="text-blue-600" />Zat\u00edm nejsou doporu\u010den\u00ed.</span>
                   </TableCell>
                 </TableRow>
               ) : first4.map((item, index) => (
-                <TableRow key={`${item.source_ip}-${index}`} className="h-[41px]">
-                  <TableCell className="py-2"><span className={priorityClass(item.priority)}><AlertTriangle size={13} />{priorityLabel(item.priority)}</span></TableCell>
-                  <TableCell className="py-2 font-mono text-xs font-medium text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</TableCell>
-                  <TableCell className="max-w-[260px] truncate py-2 text-sm font-medium text-slate-950" title={item.title}>{item.title}</TableCell>
-                  <TableCell className="max-w-[760px] truncate py-2 text-sm text-slate-600" title={item.detail}>{item.detail}</TableCell>
+                <TableRow key={`${item.source_ip}-${index}`} className="h-[33px]">
+                  <TableCell className="py-1"><span className={priorityClass(item.priority)}><AlertTriangle size={11} />{priorityLabel(item.priority)}</span></TableCell>
+                  <TableCell className="py-1 font-mono text-[11px] font-medium text-slate-700" title={item.source_ip}>{item.source_ip || "-"}</TableCell>
+                  <TableCell className="max-w-[260px] truncate py-1 text-xs font-medium text-slate-950" title={item.title}>{item.title}</TableCell>
+                  <TableCell className="max-w-[760px] truncate py-1 text-xs text-slate-600" title={item.detail}>{item.detail}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
