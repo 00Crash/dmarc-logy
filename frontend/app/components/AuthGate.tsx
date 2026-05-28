@@ -73,8 +73,8 @@ export default function AuthGate({ children }: { children: ReactNode }) {
           </CardHeader>
           <CardContent>
             <form className="space-y-4" onSubmit={submit}>
-              <Input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" />
-              <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" autoFocus />
+              <Input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" autoFocus />
+              <Input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" />
               {error && <Badge variant="destructive" className="w-full justify-center py-2">{error}</Badge>}
               <Button className="w-full" disabled={loading || !username || !password}>
                 {loading && <Loader2 size={17} className="animate-spin" />}
