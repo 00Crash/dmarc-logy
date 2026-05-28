@@ -50,19 +50,19 @@ function HomeContent() {
   }
 
   return (
-    <main className="h-screen overflow-hidden bg-white px-4 py-3 text-slate-950">
-      <div className="mx-auto grid h-full max-w-[1840px] grid-rows-[auto_minmax(0,1fr)] gap-3">
+    <main className="h-screen overflow-hidden bg-white px-4 py-2 text-slate-950">
+      <div className="mx-auto grid h-full max-w-[1840px] grid-rows-[auto_minmax(0,1fr)] gap-2">
         <NavHeader />
 
         {error ? (
-          <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-2 text-sm font-semibold text-red-700 shadow-none">
-            <AlertCircle size={18} />
+          <Card className="flex items-center gap-3 border-red-200 bg-red-50 px-4 py-1.5 text-xs font-semibold text-red-700 shadow-none">
+            <AlertCircle size={15} />
             {error}
           </Card>
         ) : null}
 
-        <div className="grid min-h-0 grid-rows-[86px_minmax(0,1fr)_210px] gap-3">
-          <section className="grid min-h-0 gap-3 xl:grid-cols-[250px_minmax(0,1fr)]">
+        <div className="grid min-h-0 grid-rows-[60px_minmax(0,1fr)_195px] gap-2">
+          <section className="grid min-h-0 gap-2 xl:grid-cols-[220px_minmax(0,1fr)]">
             <ImportActions onDone={loadData} />
             <StatsCards dashboard={dashboard} />
           </section>
